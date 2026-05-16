@@ -1,0 +1,16 @@
+# backend deps
+fastapi==0.111.0
+uvicorn[standard]==0.29.0
+python-multipart==0.0.9
+pydantic==2.7.1
+
+# ocr
+easyocr==1.7.1
+pytesseract==0.3.10
+opencv-python==4.9.0.80
+numpy==2.2.5
+Pillow==11.2.1
+
+# evaluation
+jiwer==3.0.3
+requests==2.32.2
