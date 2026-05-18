@@ -7,10 +7,20 @@ pydantic==2.7.1
 # ocr
 easyocr==1.7.1
 pytesseract==0.3.10
+paddlepaddle==2.6.2
+paddleocr==2.9.1
 opencv-python-headless==4.10.0.84
-numpy==2.2.5
+numpy>=1.24,<2.0
 Pillow==11.2.1
+
+# language detection
+lingua-language-detector==2.0.2
+
+# fuzzy post-processing
+pyspellchecker==0.8.1
+symspellpy==6.7.7
 
 # evaluation
 jiwer==3.0.3
 requests==2.32.2
+kaggle==1.6.17

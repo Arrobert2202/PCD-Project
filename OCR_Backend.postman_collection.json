@@ -1,0 +1,223 @@
+{
+  "info": {
+    "name": "OCR Backend",
+    "_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+    "description": "All endpoints for the OCR backend.\n\nSetup:\n1. Set `image_path` in collection variables to the absolute path of your image.\n2. The pre-request script will auto-encode it to base64 before every request.\n3. Update `base_url` if your backend runs on a different port.\n\nAll images are automatically pre-processed server-side before OCR: upscaled if too small, deskewed, contrast-enhanced (CLAHE), and denoised (bilateral filter).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "id": "b2c3d4e5-f6a7-8901-bcde-f12345678901",
+        "type": "text/javascript",
+        "exec": [
+          "const fs = require('fs');",
+          "",
+          "const path1 = pm.collectionVariables.get('image_path');",
+          "if (path1) {",
+          "    try {",
+          "        const data = fs.readFileSync(path1);",
+          "        pm.collectionVariables.set('image_base64', data.toString('base64'));",
+          "    } catch (e) {",
+          "        console.error('Could not read image_path: ' + e.message);",
+          "    }",
+          "}",
+          "",
+          "const path2 = pm.collectionVariables.get('image_path_2');",
+          "if (path2) {",
+          "    try {",
+          "        const data2 = fs.readFileSync(path2);",
+          "        pm.collectionVariables.set('image_base64_2', data2.toString('base64'));",
+          "    } catch (e) {",
+          "        console.error('Could not read image_path_2: ' + e.message);",
+          "    }",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    },
+    {
+      "key": "image_path",
+      "value": "D:\\Facultate\\PCD\\PCD-Project\\test_photos\\paper-cash-sell-receipt-vector.jpg",
+      "type": "string",
+      "description": "Absolute path to the primary image — auto-encoded to image_base64 before each request"
+    },
+    {
+      "key": "image_path_2",
+      "value": "",
+      "type": "string",
+      "description": "Absolute path to the second image for batch requests — auto-encoded to image_base64_2"
+    },
+    {
+      "key": "image_base64",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated from image_path by the pre-request script — do not edit manually"
+    },
+    {
+      "key": "image_base64_2",
+      "value": "",
+      "type": "string",
+      "description": "Auto-populated from image_path_2 by the pre-request script — do not edit manually"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "id": "c3d4e5f6-a7b8-9012-cdef-123456789012",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/health",
+          "host": ["{{base_url}}"],
+          "path": ["health"]
+        },
+        "description": "Returns {\"status\": \"ok\"} if the backend is running."
+      }
+    },
+    {
+      "name": "OCR",
+      "id": "d4e5f6a7-b8c9-0123-defa-234567890123",
+      "item": [
+        {
+          "name": "Single Image — EasyOCR",
+          "id": "e5f6a7b8-c9d0-1234-efab-345678901234",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"{{image_base64}}\",\n  \"engine\": \"easyocr\",\n  \"lang\": \"auto\",\n  \"fuzzy\": false,\n  \"fuzzer\": \"symspell\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/ocr",
+              "host": ["{{base_url}}"],
+              "path": ["ocr"]
+            },
+            "description": "**engine**: `easyocr` | `tesseract` | `paddleocr`\n**lang**: ISO 639-1 code (e.g. `en`, `ro`, `fr`) or `auto` (language auto-detected)\n**fuzzy**: `true` to apply spell-correction post-processing\n**fuzzer**: `symspell` (default) | `pyspellchecker`\n\nImages are pre-processed automatically (upscale → deskew → CLAHE → denoise) before being passed to the OCR engine."
+          }
+        },
+        {
+          "name": "Single Image — Tesseract",
+          "id": "f6a7b8c9-d0e1-2345-fabc-456789012345",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"{{image_base64}}\",\n  \"engine\": \"tesseract\",\n  \"lang\": \"auto\",\n  \"fuzzy\": false,\n  \"fuzzer\": \"symspell\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/ocr",
+              "host": ["{{base_url}}"],
+              "path": ["ocr"]
+            }
+          }
+        },
+        {
+          "name": "Single Image — PaddleOCR",
+          "id": "a7b8c9d0-e1f2-3456-abcd-567890123456",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"{{image_base64}}\",\n  \"engine\": \"paddleocr\",\n  \"lang\": \"auto\",\n  \"fuzzy\": false,\n  \"fuzzer\": \"symspell\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/ocr",
+              "host": ["{{base_url}}"],
+              "path": ["ocr"]
+            }
+          }
+        },
+        {
+          "name": "Batch",
+          "id": "b8c9d0e1-f2a3-4567-bcde-678901234567",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"images\": [\n    \"{{image_base64}}\",\n    \"{{image_base64_2}}\"\n  ],\n  \"engine\": \"easyocr\",\n  \"lang\": \"auto\",\n  \"fuzzy\": false,\n  \"fuzzer\": \"symspell\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/ocr/batch",
+              "host": ["{{base_url}}"],
+              "path": ["ocr", "batch"]
+            },
+            "description": "Run OCR on multiple images in one request. Returns an array of OCRResponse objects."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Evaluate",
+      "id": "c9d0e1f2-a3b4-5678-cdef-789012345678",
+      "item": [
+        {
+          "name": "Single Image",
+          "id": "d0e1f2a3-b4c5-6789-defa-890123456789",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"image\": \"{{image_base64}}\",\n  \"expected_text\": \"Replace this with the ground truth text\",\n  \"engine\": \"easyocr\",\n  \"lang\": \"auto\",\n  \"fuzzy\": false,\n  \"fuzzer\": \"symspell\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/evaluate",
+              "host": ["{{base_url}}"],
+              "path": ["evaluate"]
+            },
+            "description": "Run OCR and compare against `expected_text`.\n\nReturns WER, CER, and word/character-level error counts (substitutions, insertions, deletions, hits)."
+          }
+        },
+        {
+          "name": "Batch",
+          "id": "e1f2a3b4-c5d6-7890-efab-901234567890",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"items\": [\n    {\n      \"image\": \"{{image_base64}}\",\n      \"expected_text\": \"Replace with ground truth for image 1\"\n    },\n    {\n      \"image\": \"{{image_base64_2}}\",\n      \"expected_text\": \"Replace with ground truth for image 2\"\n    }\n  ],\n  \"engine\": \"easyocr\",\n  \"lang\": \"auto\",\n  \"fuzzy\": false,\n  \"fuzzer\": \"symspell\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": {
+              "raw": "{{base_url}}/evaluate/batch",
+              "host": ["{{base_url}}"],
+              "path": ["evaluate", "batch"]
+            },
+            "description": "Evaluate multiple images at once. Returns per-image results plus an `aggregate` block with `mean_wer` and `mean_cer`."
+          }
+        }
+      ]
+    }
+  ]
+}

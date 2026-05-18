@@ -4,6 +4,7 @@ backend/__pycache__/
 backend/*.pyc
 backend/*.pyo
 backend/.env
+backend/symspell_dicts/
 
 # Flutter
 flutter_app/.dart_tool/
