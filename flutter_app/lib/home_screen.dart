@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'ocr_service.dart';
 import 'tts_service.dart';
 import 'config.dart';
@@ -36,7 +37,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       duration: const Duration(seconds: 2),
     )..repeat(reverse: true);
 
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.12).animate(
+    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
 
@@ -54,7 +55,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     super.dispose();
   }
 
-  Future<void> _capture() async {
+  Future<void> _captureFromCamera() async {
     XFile? photo;
     try {
       photo = await _picker.pickImage(source: ImageSource.camera);
@@ -62,18 +63,35 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       _setError('camera unavailable or permission denied');
       return;
     }
-
     if (photo == null) return;
+    await _processFile(File(photo.path));
+  }
 
+  Future<void> _pickFromFiles() async {
+    FilePickerResult? result;
+    try {
+      result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+      );
+    } catch (e) {
+      _setError('could not open file picker');
+      return;
+    }
+    if (result == null || result.files.single.path == null) return;
+    await _processFile(File(result.files.single.path!));
+  }
+
+  Future<void> _processFile(File file) async {
     setState(() => _state = AppState.loading);
-    _announce('processing image, please wait');
+    _announce('processing, please wait');
 
     try {
-      final response = await _ocr.processImage(File(photo.path));
+      final response = await _ocr.processFile(file);
       _text = response.fullText;
 
       if (_text.isEmpty) {
-        _setError('no text was detected in the image');
+        _setError('no text was detected');
         return;
       }
 
@@ -155,10 +173,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
               Text(
                 'scan & listen',
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.5),
-                  fontSize: 12,
-                ),
+                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
               ),
             ],
           ),
@@ -188,8 +203,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       children: [
         const Spacer(),
         _buildStatusCard(),
-        const SizedBox(height: 60),
-        _buildMainButton(),
+        const SizedBox(height: 48),
+        if (_state == AppState.playing)
+          _buildStopButton()
+        else
+          _buildInputButtons(),
         const Spacer(),
         _buildFooter(),
       ],
@@ -201,8 +219,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       case AppState.loading:
         return _statusCard(
           icon: const SizedBox(
-            width: 32,
-            height: 32,
+            width: 32, height: 32,
             child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
           ),
           text: 'Analysing document...',
@@ -224,7 +241,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         return _statusCard(
           icon: Icon(Icons.document_scanner_outlined,
               color: Colors.white.withOpacity(0.7), size: 32),
-          text: 'Point your camera at any document and tap Scan',
+          text: 'Take a photo or upload a file to get started',
           color: Colors.white.withOpacity(0.05),
         );
     }
@@ -257,95 +274,104 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildMainButton() {
-    if (_state == AppState.playing) {
-      return Semantics(
-        label: 'stop reading',
-        button: true,
-        child: GestureDetector(
-          onTap: _stop,
-          child: Container(
-            width: 160,
-            height: 160,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.redAccent.withOpacity(0.15),
-              border: Border.all(color: Colors.redAccent, width: 2),
+  Widget _buildInputButtons() {
+    final enabled = _state == AppState.ready || _state == AppState.error;
+    return AnimatedBuilder(
+      animation: _pulseAnimation,
+      builder: (context, child) => Transform.scale(
+        scale: enabled ? _pulseAnimation.value : 1.0,
+        child: child,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _actionButton(
+            label: 'Camera',
+            semanticLabel: 'take a photo',
+            icon: Icons.camera_alt_rounded,
+            color: const Color(0xFF4A90E2),
+            onTap: enabled ? _captureFromCamera : null,
+          ),
+          const SizedBox(width: 24),
+          _actionButton(
+            label: 'Upload',
+            semanticLabel: 'upload a file or pdf',
+            icon: Icons.upload_file_rounded,
+            color: const Color(0xFF5C6BC0),
+            onTap: enabled ? _pickFromFiles : null,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _actionButton({
+    required String label,
+    required String semanticLabel,
+    required IconData icon,
+    required Color color,
+    required VoidCallback? onTap,
+  }) {
+    return Semantics(
+      label: semanticLabel,
+      button: true,
+      enabled: onTap != null,
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          width: 130,
+          height: 130,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: onTap != null
+                  ? [color, color.withOpacity(0.7)]
+                  : [Colors.grey.shade800, Colors.grey.shade700],
             ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.stop_rounded, color: Colors.redAccent, size: 56),
-                SizedBox(height: 8),
-                Text('Stop', style: TextStyle(color: Colors.redAccent, fontSize: 16, fontWeight: FontWeight.w600)),
-              ],
-            ),
+            boxShadow: onTap != null
+                ? [BoxShadow(color: color.withOpacity(0.4), blurRadius: 24, spreadRadius: 4)]
+                : [],
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: Colors.white, size: 44),
+              const SizedBox(height: 8),
+              Text(label,
+                  style: const TextStyle(
+                      color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+            ],
           ),
         ),
-      );
-    }
+      ),
+    );
+  }
 
-    if (_state == AppState.loading) {
-      return Container(
-        width: 160,
-        height: 160,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white.withOpacity(0.05),
-          border: Border.all(color: Colors.white.withOpacity(0.2), width: 2),
-        ),
-        child: const Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SizedBox(
-              width: 48,
-              height: 48,
-              child: CircularProgressIndicator(color: Colors.white54, strokeWidth: 3),
-            ),
-          ],
-        ),
-      );
-    }
-
-    final enabled = _state == AppState.ready || _state == AppState.error;
+  Widget _buildStopButton() {
     return Semantics(
-      label: 'scan document',
+      label: 'stop reading',
       button: true,
-      enabled: enabled,
       child: GestureDetector(
-        onTap: enabled ? _capture : null,
-        child: AnimatedBuilder(
-          animation: _pulseAnimation,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: enabled ? _pulseAnimation.value : 1.0,
-              child: child,
-            );
-          },
-          child: Container(
-            width: 160,
-            height: 160,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: enabled
-                    ? [const Color(0xFF4A90E2), const Color(0xFF357ABD)]
-                    : [Colors.grey.shade800, Colors.grey.shade700],
-              ),
-              boxShadow: enabled
-                  ? [BoxShadow(color: const Color(0xFF4A90E2).withOpacity(0.4), blurRadius: 30, spreadRadius: 5)]
-                  : [],
-            ),
-            child: const Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.camera_alt_rounded, color: Colors.white, size: 56),
-                SizedBox(height: 8),
-                Text('Scan', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
-              ],
-            ),
+        onTap: _stop,
+        child: Container(
+          width: 140,
+          height: 140,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.redAccent.withOpacity(0.15),
+            border: Border.all(color: Colors.redAccent, width: 2),
+          ),
+          child: const Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.stop_rounded, color: Colors.redAccent, size: 52),
+              SizedBox(height: 8),
+              Text('Stop',
+                  style: TextStyle(
+                      color: Colors.redAccent, fontSize: 16, fontWeight: FontWeight.w600)),
+            ],
           ),
         ),
       ),

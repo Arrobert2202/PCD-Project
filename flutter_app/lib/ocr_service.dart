@@ -41,17 +41,16 @@ class OcrResponse {
 }
 
 class OcrService {
-  Future<OcrResponse> processImage(File imageFile) async {
+  Future<OcrResponse> processFile(File file) async {
     final uri = Uri.parse(BackendConfig.ocrEndpoint);
     final request = http.MultipartRequest('POST', uri);
-
-    request.files.add(await http.MultipartFile.fromPath('file', imageFile.path));
+    request.files.add(await http.MultipartFile.fromPath('file', file.path));
 
     http.StreamedResponse streamedResponse;
     try {
       streamedResponse = await request.send().timeout(
-        const Duration(seconds: 15),
-        onTimeout: () => throw OcrException('request timed out after 15 seconds'),
+        const Duration(seconds: 30),
+        onTimeout: () => throw OcrException('request timed out'),
       );
     } on OcrException {
       rethrow;

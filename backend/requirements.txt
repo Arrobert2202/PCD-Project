@@ -7,7 +7,7 @@ pydantic==2.7.1
 # ocr
 easyocr==1.7.1
 pytesseract==0.3.10
-opencv-python==4.9.0.80
+opencv-python-headless==4.10.0.84
 numpy==2.2.5
 Pillow==11.2.1
 
