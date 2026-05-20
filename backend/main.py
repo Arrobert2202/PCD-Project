@@ -6,7 +6,7 @@ from jiwer import process_words, process_characters
 from fuzzy import apply_fuzzy_matching
 from layout import detect_text_regions
 from ocr_engine import run_easyocr, run_tesseract, run_paddleocr
-from preprocess import preprocess_image
+from preprocess import preprocess_image, dbg_boxes
 from schemas import (
     OCRRequest, OCRResponse, TextBlock, BoundingBox,
     BatchOCRRequest,
@@ -172,39 +172,39 @@ def evaluate_batch(request: BatchEvaluateRequest):
     return BatchEvaluateResponse(results=results, aggregate=aggregate)
 
 
+def _run_engine(engine: str, image_bytes: bytes, ocr_lang: str):
+    if engine == "paddleocr":
+        return run_paddleocr(image_bytes, ocr_lang)
+    elif engine == "tesseract":
+        try:
+            return run_tesseract(image_bytes, ocr_lang)
+        except RuntimeError as e:
+            if "not installed" in str(e).lower():
+                raise HTTPException(
+                    status_code=503,
+                    detail="Tesseract is not installed on this system.",
+                )
+            raise
+    else:
+        bboxes = detect_text_regions(image_bytes)
+        return run_easyocr(image_bytes, bboxes, ocr_lang) if bboxes else []
+
+
 def _process_image(image_bytes: bytes, engine: str, lang: str = "auto", fuzzy: bool = False, fuzzer: str = "symspell") -> OCRResponse:
     image_bytes = preprocess_image(image_bytes)
+
     ocr_lang = "en" if lang == "auto" else lang
 
     try:
-        if engine in ("paddleocr", "tesseract"):
-            if engine == "paddleocr":
-                raw = run_paddleocr(image_bytes, ocr_lang)
-            else:
-                try:
-                    raw = run_tesseract(image_bytes, ocr_lang)
-                except RuntimeError as e:
-                    if "not installed" in str(e).lower():
-                        raise HTTPException(
-                            status_code=503,
-                            detail="Tesseract is not installed on this system.",
-                        )
-                    raise
-        else:
-            bboxes = detect_text_regions(image_bytes)
-            if not bboxes:
-                return OCRResponse(
-                    status="no_text_detected",
-                    engine=engine,
-                    language=None,
-                    blocks=[],
-                    full_text="",
-                )
-            raw = run_easyocr(image_bytes, bboxes, ocr_lang)
+        raw = _run_engine(engine, image_bytes, ocr_lang)
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"OCR error: {str(e)}")
+
+    dbg_boxes(image_bytes, raw)
+
+    resolved_lang = detect_language(" ".join(t for t, _, _ in raw if t.strip())) if lang == "auto" else lang
 
     blocks = [
         TextBlock(
@@ -216,7 +216,6 @@ def _process_image(image_bytes: bytes, engine: str, lang: str = "auto", fuzzy: b
         for i, (text, conf, b) in enumerate(raw)
         if text.strip()
     ]
-    full_text = "\n".join(b.text for b in blocks)
 
     if not blocks:
         return OCRResponse(
@@ -227,7 +226,7 @@ def _process_image(image_bytes: bytes, engine: str, lang: str = "auto", fuzzy: b
             full_text="",
         )
 
-    resolved_lang = detect_language(full_text) if lang == "auto" else lang
+    full_text = "\n".join(b.text for b in blocks)
 
     if fuzzy:
         blocks = [

@@ -1,5 +1,10 @@
+import os
 import cv2
 import numpy as np
+from pathlib import Path
+
+_DEBUG = os.environ.get("OCR_DEBUG", "0") == "1"
+_DEBUG_DIR = Path(__file__).parent / "debug"
 
 
 def preprocess_image(image_bytes: bytes) -> bytes:
@@ -9,10 +14,61 @@ def preprocess_image(image_bytes: bytes) -> bytes:
     img = _upscale_if_small(img)
     img = _deskew(img)
     img = _enhance_contrast(img)
-    img = _denoise(img)
+    img = _crop_to_content(img)
+    _dbg(img, "cropped")
 
     _, buf = cv2.imencode(".png", img)
     return buf.tobytes()
+
+
+def _dbg(img: np.ndarray, name: str) -> None:
+    _DEBUG_DIR.mkdir(exist_ok=True)
+    cv2.imwrite(str(_DEBUG_DIR / f"{name}.png"), img)
+
+
+def dbg_boxes(image_bytes: bytes, raw: list) -> None:
+    nparr = np.frombuffer(image_bytes, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    for text, _, b in raw:
+        if b and text.strip():
+            x, y, w, h = b
+            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 255, 0), 2)
+    _dbg(img, "ocr_boxes")
+
+
+
+def _crop_to_content(img: np.ndarray, padding: int = 20) -> np.ndarray:
+    try:
+        import pytesseract
+    except ImportError:
+        return img
+
+    tess_exe = "D:/Tesseract-OCR/tesseract.exe"
+    if os.name == "nt" and os.path.isfile(tess_exe):
+        pytesseract.pytesseract.tesseract_cmd = tess_exe
+
+    data = pytesseract.image_to_data(
+        img, lang="eng", config="--psm 11",
+        output_type=pytesseract.Output.DICT,
+    )
+
+    boxes = [
+        (data["left"][i], data["top"][i], data["width"][i], data["height"][i])
+        for i in range(len(data["text"]))
+        if data["text"][i].strip() and int(data["conf"][i]) > 0
+    ]
+
+    if not boxes:
+        return img
+
+    h_img, w_img = img.shape[:2]
+    x1 = max(0, min(x for x, _, _, _ in boxes) - padding)
+    y1 = max(0, min(y for _, y, _, _ in boxes) - padding)
+    x2 = min(w_img, max(x + w for x, _, w, _ in boxes) + padding)
+    y2 = min(h_img, max(y + h for _, y, _, h in boxes) + padding)
+
+    cropped = img[y1:y2, x1:x2]
+    return cropped if cropped.size > 0 else img
 
 
 def _upscale_if_small(img: np.ndarray, min_side: int = 600) -> np.ndarray:
@@ -43,10 +99,7 @@ def _deskew(img: np.ndarray, max_angle: float = 15.0) -> np.ndarray:
 def _enhance_contrast(img: np.ndarray) -> np.ndarray:
     lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
     l, a, b = cv2.split(lab)
-    clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+    clahe = cv2.createCLAHE(clipLimit=1.5, tileGridSize=(8, 8))
     lab = cv2.merge([clahe.apply(l), a, b])
     return cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
 
-
-def _denoise(img: np.ndarray) -> np.ndarray:
-    return cv2.bilateralFilter(img, d=5, sigmaColor=30, sigmaSpace=30)
