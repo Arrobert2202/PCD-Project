@@ -20,7 +20,7 @@ Rationale: this is the simplest in-repo condition closest to off-the-shelf OCR b
 ## Comparison tasks
 
 1. Run batch OCR evaluation on identical dataset subset for both conditions.
-2. Compare OCR quality (WER/CER/perfect/no-text).
+2. Compare OCR quality (WER/CER/perfect-match rate/no-text rate).
 3. Compare perceived navigability of blocks on sample documents (manual rubric).
 4. Optionally compare per-image latency by logging timestamps in benchmark.
 

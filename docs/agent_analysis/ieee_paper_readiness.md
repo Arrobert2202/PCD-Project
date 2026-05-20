@@ -11,7 +11,7 @@
 3. **Method:** preprocessing, optional layout-based region OCR, optional fuzzy correction, TTS navigation.
 4. **Evaluation:** WER/CER via benchmark and `/evaluate` endpoints.
 5. **Findings (to fill):** comparative engine performance + accessibility observations.
-6. **Limitations:** PDF support mismatch, limited reproducible dataset packaging, privacy policy gaps.
+6. **Limitations:** PDF support mismatch, limited reproducible packaged datasets, privacy policy gaps.
 
 ## Keywords
 

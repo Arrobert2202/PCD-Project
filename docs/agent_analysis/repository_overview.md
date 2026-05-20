@@ -44,7 +44,7 @@ A local-network OCR prototype for visually impaired users consisting of:
 
 | Path | Purpose | Evidence | Notes |
 |---|---|---|---|
-| `/README.md` | Setup and high-level description | Declares “ReadDoc — OCR Document Reader”; backend+Flutter run steps | Mentions `eval/` folder that is not present in tree (inconsistency) |
+| `/README.md` | Setup and high-level description | Declares “ReadDoc — OCR Document Reader”; backend+Flutter run steps | Mentions `eval/` folder that does not exist in the repository (inconsistency) |
 | `/backend/main.py` | API endpoints and OCR/evaluation orchestration | `@app.post('/ocr')`, `@app.post('/evaluate')`, `_process_image` | Core server logic and response shaping |
 | `/backend/ocr_engine.py` | OCR engine adapters | `run_easyocr`, `run_tesseract`, `run_paddleocr` | Multi-engine support implemented |
 | `/backend/layout.py` | Text-region detection and reading-order sorting | `detect_text_regions`, `sort_reading_order` | Used only by EasyOCR path |
