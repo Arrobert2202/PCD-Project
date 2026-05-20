@@ -1,13 +1,214 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'ocr_service.dart';
-import 'tts_service.dart';
+import 'ocr_result_screen.dart';
 import 'config.dart';
 
-enum AppState { ready, loading, playing, error }
+enum AppState { ready, loading, error }
+
+class _LangOption {
+  final String code;
+  final String name;
+  final String flag;
+  const _LangOption(this.code, this.name, this.flag);
+}
+
+const _kLanguages = [
+  _LangOption('auto', 'Auto-detect',          '🌐'),
+  _LangOption('en',   'English',              '🇬🇧'),
+  _LangOption('ro',   'Romanian',             '🇷🇴'),
+  _LangOption('fr',   'French',               '🇫🇷'),
+  _LangOption('de',   'German',               '🇩🇪'),
+  _LangOption('es',   'Spanish',              '🇪🇸'),
+  _LangOption('pt',   'Portuguese',           '🇵🇹'),
+  _LangOption('it',   'Italian',              '🇮🇹'),
+  _LangOption('nl',   'Dutch',                '🇳🇱'),
+  _LangOption('pl',   'Polish',               '🇵🇱'),
+  _LangOption('ru',   'Russian',              '🇷🇺'),
+  _LangOption('ar',   'Arabic',               '🇸🇦'),
+  _LangOption('zh',   'Chinese (Simplified)', '🇨🇳'),
+  _LangOption('ja',   'Japanese',             '🇯🇵'),
+  _LangOption('ko',   'Korean',               '🇰🇷'),
+  _LangOption('sv',   'Swedish',              '🇸🇪'),
+  _LangOption('tr',   'Turkish',              '🇹🇷'),
+  _LangOption('eu',   'Basque',               '🏴'),
+  _LangOption('lv',   'Latvian',              '🇱🇻'),
+];
+
+class _LanguageMenu extends StatelessWidget {
+  final String selected;
+  final ScrollController scrollController;
+  final void Function(String) onSelected;
+
+  const _LanguageMenu({
+    required this.selected,
+    required this.scrollController,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color(0xFF1A1A2E),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      child: Column(
+        children: [
+          // drag handle
+          Padding(
+            padding: const EdgeInsets.only(top: 10, bottom: 4),
+            child: Container(
+              width: 36,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.25),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+          ),
+          // title
+          Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            child: Row(
+              children: [
+                const Text(
+                  'Select Language',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600),
+                ),
+                const Spacer(),
+                Text(
+                  '${_kLanguages.length} languages',
+                  style: TextStyle(
+                      color: Colors.white.withOpacity(0.35), fontSize: 12),
+                ),
+              ],
+            ),
+          ),
+          Divider(color: Colors.white.withOpacity(0.07), height: 1),
+          // list
+          Expanded(
+            child: ListView.builder(
+              controller: scrollController,
+              itemCount: _kLanguages.length,
+              itemBuilder: (_, i) {
+                final lang = _kLanguages[i];
+                final isSelected = lang.code == selected;
+                return _LanguageTile(
+                  lang: lang,
+                  isSelected: isSelected,
+                  onTap: () => onSelected(lang.code),
+                );
+              },
+            ),
+          ),
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
+        ],
+      ),
+    );
+  }
+}
+
+class _LanguageTile extends StatelessWidget {
+  final _LangOption lang;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _LanguageTile({
+    required this.lang,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      label: lang.name,
+      button: true,
+      selected: isSelected,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          splashColor: const Color(0xFF4A90E2).withOpacity(0.1),
+          highlightColor: const Color(0xFF4A90E2).withOpacity(0.06),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? const Color(0xFF4A90E2).withOpacity(0.1)
+                  : Colors.transparent,
+              border: Border(
+                left: BorderSide(
+                  color: isSelected
+                      ? const Color(0xFF4A90E2)
+                      : Colors.transparent,
+                  width: 3,
+                ),
+              ),
+            ),
+            child: Row(
+              children: [
+                SizedBox(
+                  width: 36,
+                  child: Text(
+                    lang.flag,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontFamilyFallback: [
+                        'Apple Color Emoji',
+                        'Noto Color Emoji'
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Text(
+                    lang.name,
+                    style: TextStyle(
+                      color: isSelected
+                          ? const Color(0xFF4A90E2)
+                          : Colors.white.withOpacity(0.9),
+                      fontSize: 14,
+                      fontWeight: isSelected
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ),
+                Text(
+                  lang.code.toUpperCase(),
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.3),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                if (isSelected) ...[
+                  const SizedBox(width: 8),
+                  const Icon(Icons.check_rounded,
+                      color: Color(0xFF4A90E2), size: 18),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,14 +217,20 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   final _ocr = OcrService();
-  final _tts = TtsService();
   final _picker = ImagePicker();
 
   AppState _state = AppState.ready;
   String _error = '';
-  String _text = '';
+
+  String _engine = 'easyocr';
+  String _lang = 'auto';
+  bool _fuzzy = false;
+  String _fuzzer = 'symspell';
+
+  Uint8List? _lastImageBytes;
 
   late AnimationController _pulseController;
   late Animation<double> _pulseAnimation;
@@ -40,18 +247,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _pulseAnimation = Tween<double>(begin: 1.0, end: 1.08).animate(
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
-
-    _tts.initialize().then((_) {
-      if (!_tts.isAvailable) {
-        _setError('text-to-speech is not supported on this device');
-      }
-    });
   }
 
   @override
   void dispose() {
     _pulseController.dispose();
-    _tts.dispose();
     super.dispose();
   }
 
@@ -83,39 +283,46 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   }
 
   Future<void> _processFile(File file) async {
+    await _processBytes(await file.readAsBytes());
+  }
+
+  Future<void> _processBytes(Uint8List imageBytes) async {
     setState(() => _state = AppState.loading);
     _announce('processing, please wait');
 
     try {
-      final response = await _ocr.processFile(file);
-      _text = response.fullText;
+      final options = OcrOptions(
+        engine: _engine,
+        lang: _lang,
+        fuzzy: _fuzzy,
+        fuzzer: _fuzzer,
+      );
+      final response = await _ocr.processBytes(imageBytes, options);
 
-      if (_text.isEmpty) {
+      if (response.status == 'no_text_detected' || response.blocks.isEmpty) {
         _setError('no text was detected');
         return;
       }
 
-      setState(() => _state = AppState.playing);
-      _announce('reading text aloud');
-      await _tts.speak(_text, onComplete: _onDone);
+      setState(() {
+        _state = AppState.ready;
+        _lastImageBytes = imageBytes;
+      });
+      if (!mounted) return;
+      await Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => OcrResultScreen(
+            imageBytes: imageBytes,
+            response: response,
+          ),
+        ),
+      );
     } on OcrException catch (e) {
       _setError(e.message);
     } catch (e) {
       _setError('unexpected error: $e');
     }
-  }
-
-  void _onDone() {
-    if (mounted) {
-      setState(() => _state = AppState.ready);
-      _announce('done. ready to scan again');
-    }
-  }
-
-  Future<void> _stop() async {
-    await _tts.stop();
-    setState(() => _state = AppState.ready);
-    _announce('stopped');
   }
 
   void _setError(String msg) {
@@ -173,7 +380,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
               Text(
                 'scan & listen',
-                style: TextStyle(color: Colors.white.withOpacity(0.5), fontSize: 12),
+                style: TextStyle(
+                    color: Colors.white.withOpacity(0.5), fontSize: 12),
               ),
             ],
           ),
@@ -188,7 +396,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.settings_outlined, color: Colors.white, size: 24),
+                child: const Icon(Icons.settings_outlined,
+                    color: Colors.white, size: 24),
               ),
             ),
           ),
@@ -203,14 +412,83 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       children: [
         const Spacer(),
         _buildStatusCard(),
-        const SizedBox(height: 48),
-        if (_state == AppState.playing)
-          _buildStopButton()
-        else
-          _buildInputButtons(),
+        const SizedBox(height: 40),
+        _buildInputButtons(),
+        const SizedBox(height: 16),
+        if (_lastImageBytes != null) ...[
+          _buildLastImageStrip(),
+          const SizedBox(height: 12),
+        ],
+        const SizedBox(height: 12),
+        _buildOcrOptionsPanel(),
         const Spacer(),
         _buildFooter(),
       ],
+    );
+  }
+
+  Widget _buildLastImageStrip() {
+    final enabled = _state == AppState.ready || _state == AppState.error;
+    return Semantics(
+      label: 're-process last image',
+      button: true,
+      enabled: enabled,
+      child: GestureDetector(
+        onTap: enabled ? () => _processBytes(_lastImageBytes!) : null,
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 20),
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.05),
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: Colors.white.withOpacity(0.08)),
+          ),
+          child: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.memory(
+                  _lastImageBytes!,
+                  width: 52,
+                  height: 52,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Re-process last image',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'with current settings',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.4),
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.refresh_rounded,
+                color: enabled
+                    ? const Color(0xFF4A90E2)
+                    : Colors.white.withOpacity(0.2),
+                size: 22,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -219,21 +497,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       case AppState.loading:
         return _statusCard(
           icon: const SizedBox(
-            width: 32, height: 32,
-            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+            width: 32,
+            height: 32,
+            child: CircularProgressIndicator(
+                color: Colors.white, strokeWidth: 3),
           ),
           text: 'Analysing document...',
           color: const Color(0xFF0F3460),
         );
-      case AppState.playing:
-        return _statusCard(
-          icon: const Icon(Icons.volume_up_rounded, color: Colors.greenAccent, size: 32),
-          text: 'Reading aloud...',
-          color: const Color(0xFF0D3B2E),
-        );
       case AppState.error:
         return _statusCard(
-          icon: const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 32),
+          icon: const Icon(Icons.error_outline_rounded,
+              color: Colors.redAccent, size: 32),
           text: _error,
           color: const Color(0xFF3B0D0D),
         );
@@ -247,7 +522,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     }
   }
 
-  Widget _statusCard({required Widget icon, required String text, required Color color}) {
+  Widget _statusCard(
+      {required Widget icon, required String text, required Color color}) {
     return Semantics(
       label: text,
       child: Container(
@@ -265,7 +541,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             Expanded(
               child: Text(
                 text,
-                style: const TextStyle(color: Colors.white, fontSize: 15, height: 1.4),
+                style: const TextStyle(
+                    color: Colors.white, fontSize: 15, height: 1.4),
               ),
             ),
           ],
@@ -331,7 +608,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   : [Colors.grey.shade800, Colors.grey.shade700],
             ),
             boxShadow: onTap != null
-                ? [BoxShadow(color: color.withOpacity(0.4), blurRadius: 24, spreadRadius: 4)]
+                ? [
+                    BoxShadow(
+                        color: color.withOpacity(0.4),
+                        blurRadius: 24,
+                        spreadRadius: 4)
+                  ]
                 : [],
           ),
           child: Column(
@@ -341,7 +623,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               const SizedBox(height: 8),
               Text(label,
                   style: const TextStyle(
-                      color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+                      color: Colors.white,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600)),
             ],
           ),
         ),
@@ -349,32 +633,177 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     );
   }
 
-  Widget _buildStopButton() {
+  Widget _buildLanguageSelectorButton() {
+    final current = _kLanguages.firstWhere((l) => l.code == _lang,
+        orElse: () => _kLanguages.first);
     return Semantics(
-      label: 'stop reading',
+      label: 'selected language: ${current.name}',
       button: true,
       child: GestureDetector(
-        onTap: _stop,
+        onTap: _showLanguageMenu,
         child: Container(
-          width: 140,
-          height: 140,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.redAccent.withOpacity(0.15),
-            border: Border.all(color: Colors.redAccent, width: 2),
+            color: const Color(0xFF4A90E2).withOpacity(0.12),
+            borderRadius: BorderRadius.circular(10),
+            border:
+                Border.all(color: const Color(0xFF4A90E2).withOpacity(0.4)),
           ),
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.stop_rounded, color: Colors.redAccent, size: 52),
-              SizedBox(height: 8),
-              Text('Stop',
-                  style: TextStyle(
-                      color: Colors.redAccent, fontSize: 16, fontWeight: FontWeight.w600)),
+              Text(current.flag,
+                  style: const TextStyle(fontSize: 20,
+                      fontFamilyFallback: ['Apple Color Emoji', 'Noto Color Emoji'])),
+              const SizedBox(width: 8),
+              Text(
+                current.name,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(width: 6),
+              Icon(Icons.expand_more_rounded,
+                  color: Colors.white.withOpacity(0.55), size: 18),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  void _showLanguageMenu() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (ctx) => DraggableScrollableSheet(
+        expand: false,
+        initialChildSize: 0.55,
+        minChildSize: 0.35,
+        maxChildSize: 0.88,
+        builder: (_, controller) => _LanguageMenu(
+          selected: _lang,
+          scrollController: controller,
+          onSelected: (code) {
+            setState(() => _lang = code);
+            Navigator.pop(ctx);
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOcrOptionsPanel() {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.white.withOpacity(0.08)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _optionLabel('Engine'),
+          const SizedBox(height: 8),
+          _chipRow(
+            options: const ['easyocr', 'tesseract', 'paddleocr'],
+            labels: const ['EasyOCR', 'Tesseract', 'PaddleOCR'],
+            selected: _engine,
+            onSelected: (v) => setState(() => _engine = v),
+          ),
+          const SizedBox(height: 14),
+          _optionLabel('Language'),
+          const SizedBox(height: 8),
+          _buildLanguageSelectorButton(),
+          const SizedBox(height: 14),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _optionLabel('Fuzzy matching'),
+              Semantics(
+                label: 'fuzzy matching toggle',
+                child: Switch(
+                  value: _fuzzy,
+                  onChanged: (v) => setState(() => _fuzzy = v),
+                  activeColor: const Color(0xFF4A90E2),
+                  materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+              ),
+            ],
+          ),
+          if (_fuzzy) ...[
+            const SizedBox(height: 8),
+            _chipRow(
+              options: const ['symspell', 'pyspellchecker'],
+              labels: const ['SymSpell', 'PySpellchecker'],
+              selected: _fuzzer,
+              onSelected: (v) => setState(() => _fuzzer = v),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _optionLabel(String text) {
+    return Text(
+      text,
+      style: TextStyle(
+        color: Colors.white.withOpacity(0.55),
+        fontSize: 11,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.8,
+      ),
+    );
+  }
+
+  Widget _chipRow({
+    required List<String> options,
+    required List<String> labels,
+    required String selected,
+    required void Function(String) onSelected,
+  }) {
+    return Wrap(
+      spacing: 8,
+      runSpacing: 6,
+      children: [
+        for (int i = 0; i < options.length; i++)
+          Semantics(
+            label: labels[i],
+            button: true,
+            selected: selected == options[i],
+            child: ChoiceChip(
+              label: Text(labels[i]),
+              selected: selected == options[i],
+              onSelected: (_) => onSelected(options[i]),
+              selectedColor: const Color(0xFF4A90E2),
+              backgroundColor: Colors.white.withOpacity(0.08),
+              labelStyle: TextStyle(
+                color: selected == options[i]
+                    ? Colors.white
+                    : Colors.white.withOpacity(0.55),
+                fontSize: 12,
+                fontWeight: selected == options[i]
+                    ? FontWeight.w600
+                    : FontWeight.normal,
+              ),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+              side: BorderSide(
+                color: selected == options[i]
+                    ? const Color(0xFF4A90E2)
+                    : Colors.white.withOpacity(0.12),
+              ),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              visualDensity: VisualDensity.compact,
+            ),
+          ),
+      ],
     );
   }
 
@@ -390,14 +819,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   void _showSettings() {
     final hostCtrl = TextEditingController(text: BackendConfig.host);
-    final portCtrl = TextEditingController(text: BackendConfig.port.toString());
+    final portCtrl =
+        TextEditingController(text: BackendConfig.port.toString());
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A2E),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Backend Settings', style: TextStyle(color: Colors.white)),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text('Backend Settings',
+            style: TextStyle(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -408,14 +840,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'IP Address',
-                  labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                  labelStyle:
+                      TextStyle(color: Colors.white.withOpacity(0.6)),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                    borderSide:
+                        BorderSide(color: Colors.white.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF4A90E2)),
+                    borderSide:
+                        const BorderSide(color: Color(0xFF4A90E2)),
                   ),
                 ),
                 keyboardType: TextInputType.number,
@@ -429,14 +864,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'Port',
-                  labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
+                  labelStyle:
+                      TextStyle(color: Colors.white.withOpacity(0.6)),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.white.withOpacity(0.2)),
+                    borderSide:
+                        BorderSide(color: Colors.white.withOpacity(0.2)),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: const BorderSide(color: Color(0xFF4A90E2)),
+                    borderSide:
+                        const BorderSide(color: Color(0xFF4A90E2)),
                   ),
                 ),
                 keyboardType: TextInputType.number,
@@ -447,16 +885,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel', style: TextStyle(color: Colors.white.withOpacity(0.6))),
+            child: Text('Cancel',
+                style: TextStyle(color: Colors.white.withOpacity(0.6))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF4A90E2),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: () {
               BackendConfig.host = hostCtrl.text.trim();
-              BackendConfig.port = int.tryParse(portCtrl.text.trim()) ?? 8000;
+              BackendConfig.port =
+                  int.tryParse(portCtrl.text.trim()) ?? 8000;
               Navigator.pop(ctx);
             },
             child: const Text('Save'),

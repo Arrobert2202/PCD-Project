@@ -191,7 +191,7 @@ def _run_engine(engine: str, image_bytes: bytes, ocr_lang: str):
 
 
 def _process_image(image_bytes: bytes, engine: str, lang: str = "auto", fuzzy: bool = False, fuzzer: str = "symspell") -> OCRResponse:
-    image_bytes = preprocess_image(image_bytes)
+    image_bytes, transform = preprocess_image(image_bytes)
 
     ocr_lang = "en" if lang == "auto" else lang
 
@@ -206,16 +206,16 @@ def _process_image(image_bytes: bytes, engine: str, lang: str = "auto", fuzzy: b
 
     resolved_lang = detect_language(" ".join(t for t, _, _ in raw if t.strip())) if lang == "auto" else lang
 
-    blocks = [
-        TextBlock(
-            index=i,
-            text=text,
-            confidence=conf,
-            bbox=BoundingBox(x=b[0], y=b[1], width=b[2], height=b[3]) if b else None,
-        )
-        for i, (text, conf, b) in enumerate(raw)
-        if text.strip()
-    ]
+    blocks = []
+    for i, (text, conf, b) in enumerate(raw):
+        if not text.strip():
+            continue
+        if b:
+            ox, oy, ow, oh = transform.bbox_to_original(*b)
+            bbox = BoundingBox(x=ox, y=oy, width=ow, height=oh)
+        else:
+            bbox = None
+        blocks.append(TextBlock(index=i, text=text, confidence=conf, bbox=bbox))
 
     if not blocks:
         return OCRResponse(

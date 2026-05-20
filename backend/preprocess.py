@@ -1,24 +1,90 @@
+import math
 import os
 import cv2
 import numpy as np
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Optional, Tuple
 
 _DEBUG = os.environ.get("OCR_DEBUG", "0") == "1"
 _DEBUG_DIR = Path(__file__).parent / "debug"
 
 
-def preprocess_image(image_bytes: bytes) -> bytes:
+@dataclass
+class PreprocessTransform:
+    """Records every coordinate-changing step so OCR bboxes (in preprocessed
+    space) can be mapped back to original image space.
+
+    Transform order applied during preprocessing:
+      1. upscale   (scale factor applied to both axes)
+      2. deskew    (rotation around image centre)
+
+    Inverse order to recover original coords:
+      undo deskew → undo upscale
+    """
+    upscale_factor: float
+    deskew_angle: float        # degrees passed to getRotationMatrix2D; 0 = no-op
+    deskew_center_x: float     # rotation centre in the upscaled image
+    deskew_center_y: float
+
+    def bbox_to_original(
+        self, x: int, y: int, w: int, h: int
+    ) -> Tuple[int, int, int, int]:
+        fx, fy, fw, fh = float(x), float(y), float(w), float(h)
+
+        # 1. undo deskew: rotate all four corners by -angle, then re-bbox
+        if self.deskew_angle != 0.0:
+            corners = [
+                (fx,      fy     ),
+                (fx + fw, fy     ),
+                (fx + fw, fy + fh),
+                (fx,      fy + fh),
+            ]
+            cx, cy = self.deskew_center_x, self.deskew_center_y
+            rotated = [_rotate_point(px, py, cx, cy, -self.deskew_angle)
+                       for px, py in corners]
+            xs = [p[0] for p in rotated]
+            ys = [p[1] for p in rotated]
+            fx, fy = min(xs), min(ys)
+            fw, fh = max(xs) - fx, max(ys) - fy
+
+        # 3. undo upscale
+        f = self.upscale_factor
+        return (
+            int(round(fx / f)),
+            int(round(fy / f)),
+            int(round(fw / f)),
+            int(round(fh / f)),
+        )
+
+
+def _rotate_point(
+    x: float, y: float, cx: float, cy: float, angle_deg: float
+) -> Tuple[float, float]:
+    a = math.radians(angle_deg)
+    cos_a, sin_a = math.cos(a), math.sin(a)
+    dx, dy = x - cx, y - cy
+    return cx + dx * cos_a - dy * sin_a, cy + dx * sin_a + dy * cos_a
+
+
+def preprocess_image(
+    image_bytes: bytes,
+) -> Tuple[bytes, PreprocessTransform]:
     nparr = np.frombuffer(image_bytes, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    img = _upscale_if_small(img)
-    img = _deskew(img)
-    img = _enhance_contrast(img)
-    img = _crop_to_content(img)
-    _dbg(img, "cropped")
+    img, upscale_factor = _upscale_if_small(img)
+    img, deskew_angle, deskew_center = _deskew(img)
+    _dbg(img, "deskewed")
 
     _, buf = cv2.imencode(".png", img)
-    return buf.tobytes()
+    transform = PreprocessTransform(
+        upscale_factor=upscale_factor,
+        deskew_angle=deskew_angle,
+        deskew_center_x=deskew_center[0],
+        deskew_center_y=deskew_center[1],
+    )
+    return buf.tobytes(), transform
 
 
 def _dbg(img: np.ndarray, name: str) -> None:
@@ -36,70 +102,85 @@ def dbg_boxes(image_bytes: bytes, raw: list) -> None:
     _dbg(img, "ocr_boxes")
 
 
-
-def _crop_to_content(img: np.ndarray, padding: int = 20) -> np.ndarray:
-    try:
-        import pytesseract
-    except ImportError:
-        return img
-
-    tess_exe = "D:/Tesseract-OCR/tesseract.exe"
-    if os.name == "nt" and os.path.isfile(tess_exe):
-        pytesseract.pytesseract.tesseract_cmd = tess_exe
-
-    data = pytesseract.image_to_data(
-        img, lang="eng", config="--psm 11",
-        output_type=pytesseract.Output.DICT,
-    )
-
-    boxes = [
-        (data["left"][i], data["top"][i], data["width"][i], data["height"][i])
-        for i in range(len(data["text"]))
-        if data["text"][i].strip() and int(data["conf"][i]) > 0
-    ]
-
-    if not boxes:
-        return img
-
-    h_img, w_img = img.shape[:2]
-    x1 = max(0, min(x for x, _, _, _ in boxes) - padding)
-    y1 = max(0, min(y for _, y, _, _ in boxes) - padding)
-    x2 = min(w_img, max(x + w for x, _, w, _ in boxes) + padding)
-    y2 = min(h_img, max(y + h for _, y, _, h in boxes) + padding)
-
-    cropped = img[y1:y2, x1:x2]
-    return cropped if cropped.size > 0 else img
-
-
-def _upscale_if_small(img: np.ndarray, min_side: int = 600) -> np.ndarray:
-    h, w = img.shape[:2]
-    if min(h, w) < min_side:
-        scale = min_side / min(h, w)
-        img = cv2.resize(img, (int(w * scale), int(h * scale)), interpolation=cv2.INTER_CUBIC)
-    return img
-
-
-def _deskew(img: np.ndarray, max_angle: float = 15.0) -> np.ndarray:
+def _estimate_char_height(img: np.ndarray) -> Optional[float]:
+    """Return the median height of character-shaped connected components."""
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+    _, thresh = cv2.threshold(
+        gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU
+    )
+    num_labels, _, stats, _ = cv2.connectedComponentsWithStats(
+        thresh, connectivity=8
+    )
+    if num_labels < 2:
+        return None
+
+    img_h, img_w = img.shape[:2]
+    heights = []
+    for i in range(1, num_labels):  # label 0 is background
+        comp_h = int(stats[i, cv2.CC_STAT_HEIGHT])
+        comp_w = int(stats[i, cv2.CC_STAT_WIDTH])
+        area   = int(stats[i, cv2.CC_STAT_AREA])
+
+        if area < 10:                      # noise
+            continue
+        if comp_h < 4:                     # too short to be a character
+            continue
+        if comp_h > img_h * 0.25:         # taller than 25 % of image — not a char
+            continue
+        if comp_w > img_w * 0.6:          # nearly full-width — rule / border
+            continue
+        if comp_h / max(comp_w, 1) > 8:   # extreme aspect ratio — vertical line
+            continue
+
+        heights.append(comp_h)
+
+    if len(heights) < 5:
+        return None
+    return float(np.median(heights))
+
+
+def _upscale_if_small(
+    img: np.ndarray, target_char_height: int = 32
+) -> Tuple[np.ndarray, float]:
+    median_h = _estimate_char_height(img)
+    if median_h is None or median_h >= target_char_height:
+        return img, 1.0
+
+    factor = min(target_char_height / median_h, 6.0)  # cap at 6× to avoid runaway memory
+    h, w = img.shape[:2]
+    img = cv2.resize(
+        img,
+        (int(w * factor), int(h * factor)),
+        interpolation=cv2.INTER_LANCZOS4,
+    )
+    return img, factor
+
+
+def _deskew(
+    img: np.ndarray, max_angle: float = 15.0
+) -> Tuple[np.ndarray, float, Tuple[float, float]]:
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    thresh = cv2.threshold(
+        gray, 0, 255, cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU
+    )[1]
     coords = np.column_stack(np.where(thresh > 0))
     if len(coords) < 10:
-        return img
+        return img, 0.0, (0.0, 0.0)
+
     angle = cv2.minAreaRect(coords)[-1]
-    # minAreaRect returns angle in [-90, 0); nudge into [-45, 45) range
     if angle < -45:
         angle = 90 + angle
     if abs(angle) > max_angle:
-        return img
+        return img, 0.0, (0.0, 0.0)
+
     h, w = img.shape[:2]
-    M = cv2.getRotationMatrix2D((w // 2, h // 2), angle, 1.0)
-    return cv2.warpAffine(img, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+    cx, cy = w / 2.0, h / 2.0
+    M = cv2.getRotationMatrix2D((cx, cy), angle, 1.0)
+    rotated = cv2.warpAffine(
+        img, M, (w, h),
+        flags=cv2.INTER_CUBIC,
+        borderMode=cv2.BORDER_REPLICATE,
+    )
+    return rotated, angle, (cx, cy)
 
-
-def _enhance_contrast(img: np.ndarray) -> np.ndarray:
-    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-    l, a, b = cv2.split(lab)
-    clahe = cv2.createCLAHE(clipLimit=1.5, tileGridSize=(8, 8))
-    lab = cv2.merge([clahe.apply(l), a, b])
-    return cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
 
