@@ -24,3 +24,6 @@ symspellpy==6.7.7
 jiwer==3.0.3
 requests==2.32.2
 kaggle==1.6.17
+
+# dataset preparation
+datasets==2.20.0
