@@ -1,8 +1,16 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+import 'dart:math' as math;
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:image/image.dart' as img;
 import 'config.dart';
+
+const int kOcrMaxUploadSide = 1800;
+const int kOcrUploadJpegQuality = 85;
+
+const int _maxUploadPixels = 2500000;
+const int _maxUploadBytes = 1500000;
 
 class OcrOptions {
   final String engine;
@@ -18,11 +26,11 @@ class OcrOptions {
   });
 
   Map<String, dynamic> toJson() => {
-        'engine': engine,
-        'lang': lang,
-        'fuzzy': fuzzy,
-        'fuzzer': fuzzer,
-      };
+    'engine': engine,
+    'lang': lang,
+    'fuzzy': fuzzy,
+    'fuzzer': fuzzer,
+  };
 }
 
 class BoundingBox {
@@ -39,11 +47,11 @@ class BoundingBox {
   });
 
   factory BoundingBox.fromJson(Map<String, dynamic> json) => BoundingBox(
-        x: json['x'] as int,
-        y: json['y'] as int,
-        width: json['width'] as int,
-        height: json['height'] as int,
-      );
+    x: json['x'] as int,
+    y: json['y'] as int,
+    width: json['width'] as int,
+    height: json['height'] as int,
+  );
 }
 
 class OcrBlock {
@@ -60,13 +68,13 @@ class OcrBlock {
   });
 
   factory OcrBlock.fromJson(Map<String, dynamic> json) => OcrBlock(
-        index: json['index'] as int,
-        text: json['text'] as String,
-        confidence: (json['confidence'] as num?)?.toDouble(),
-        bbox: json['bbox'] != null
-            ? BoundingBox.fromJson(json['bbox'] as Map<String, dynamic>)
-            : null,
-      );
+    index: json['index'] as int,
+    text: json['text'] as String,
+    confidence: (json['confidence'] as num?)?.toDouble(),
+    bbox: json['bbox'] != null
+        ? BoundingBox.fromJson(json['bbox'] as Map<String, dynamic>)
+        : null,
+  );
 }
 
 class OcrResponse {
@@ -85,37 +93,43 @@ class OcrResponse {
   });
 
   factory OcrResponse.fromJson(Map<String, dynamic> json) => OcrResponse(
-        status: json['status'] as String,
-        engine: json['engine'] as String,
-        language: json['language'] as String?,
-        blocks: (json['blocks'] as List)
-            .map((b) => OcrBlock.fromJson(b as Map<String, dynamic>))
-            .toList(),
-        fullText: json['full_text'] as String,
-      );
+    status: json['status'] as String,
+    engine: json['engine'] as String,
+    language: json['language'] as String?,
+    blocks: (json['blocks'] as List)
+        .map((b) => OcrBlock.fromJson(b as Map<String, dynamic>))
+        .toList(),
+    fullText: json['full_text'] as String,
+  );
+}
+
+class OcrProcessResult {
+  final OcrResponse response;
+  final Uint8List imageBytes;
+
+  const OcrProcessResult({required this.response, required this.imageBytes});
 }
 
 class OcrService {
-  Future<OcrResponse> processFile(File file, OcrOptions options) async {
+  Future<OcrProcessResult> processFile(File file, OcrOptions options) async {
     return processBytes(await file.readAsBytes(), options);
   }
 
-  Future<OcrResponse> processBytes(
-      Uint8List imageBytes, OcrOptions options) async {
+  Future<OcrProcessResult> processBytes(
+    Uint8List imageBytes,
+    OcrOptions options,
+  ) async {
+    final uploadBytes = await prepareOcrUploadBytes(imageBytes);
     final uri = Uri.parse(BackendConfig.ocrEndpoint);
     final body = jsonEncode({
-      'image': base64Encode(imageBytes),
+      'image': base64Encode(uploadBytes),
       ...options.toJson(),
     });
 
     http.Response response;
     try {
       response = await http
-          .post(
-            uri,
-            headers: {'Content-Type': 'application/json'},
-            body: body,
-          )
+          .post(uri, headers: {'Content-Type': 'application/json'}, body: body)
           .timeout(
             const Duration(seconds: 30),
             onTimeout: () => throw OcrException('request timed out'),
@@ -127,13 +141,68 @@ class OcrService {
     }
 
     if (response.statusCode == 200) {
-      return OcrResponse.fromJson(
-          jsonDecode(response.body) as Map<String, dynamic>);
+      return OcrProcessResult(
+        response: OcrResponse.fromJson(
+          jsonDecode(response.body) as Map<String, dynamic>,
+        ),
+        imageBytes: uploadBytes,
+      );
     } else {
       throw OcrException(
-          'server error ${response.statusCode}: ${response.body}');
+        'server error ${response.statusCode}: ${response.body}',
+      );
     }
   }
+}
+
+Future<Uint8List> prepareOcrUploadBytes(Uint8List imageBytes) {
+  return compute<Uint8List, Uint8List>(
+    _prepareOcrUploadBytes,
+    imageBytes,
+    debugLabel: 'prepareOcrUploadBytes',
+  );
+}
+
+Uint8List _prepareOcrUploadBytes(Uint8List imageBytes) {
+  final decoded = img.decodeImage(imageBytes);
+  if (decoded == null) {
+    return imageBytes;
+  }
+
+  final scale = _uploadScale(decoded.width, decoded.height);
+  if (scale >= 1.0 && imageBytes.lengthInBytes <= _maxUploadBytes) {
+    return imageBytes;
+  }
+
+  var working = img.bakeOrientation(decoded);
+  if (scale < 1.0) {
+    working = img.copyResize(
+      working,
+      width: math.max(1, (working.width * scale).round()),
+      height: math.max(1, (working.height * scale).round()),
+      interpolation: img.Interpolation.average,
+    );
+  }
+
+  return img.encodeJpg(working, quality: kOcrUploadJpegQuality);
+}
+
+double _uploadScale(int width, int height) {
+  var scale = 1.0;
+  final maxSide = width > height ? width : height;
+  if (maxSide > kOcrMaxUploadSide) {
+    scale = kOcrMaxUploadSide / maxSide;
+  }
+
+  final pixels = width * height;
+  if (pixels > _maxUploadPixels) {
+    final pixelScale = math.sqrt(_maxUploadPixels / pixels);
+    if (pixelScale < scale) {
+      scale = pixelScale;
+    }
+  }
+
+  return scale;
 }
 
 class OcrException implements Exception {
