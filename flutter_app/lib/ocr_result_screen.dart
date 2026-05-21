@@ -28,6 +28,7 @@ class _OcrResultScreenState extends State<OcrResultScreen> {
   bool _showBoxes = true;
   bool _showLabels = true;
   late Future<ui.Size> _imageSizeFuture;
+  int _speakSeq = 0;
 
   // item height used for approximate scroll-to-selected
   static const double _itemHeight = 64.0;
@@ -65,26 +66,31 @@ class _OcrResultScreenState extends State<OcrResultScreen> {
     });
     await _tts.speak(
       widget.response.fullText,
+      language: widget.response.language,
       onComplete: () {
         if (mounted) setState(() => _isPlaying = false);
       },
     );
   }
 
-  Future<void> _readBlock(int blockIndex) async {
-    final block = widget.response.blocks[blockIndex];
+  Future<void> _readBlock(OcrBlock block) async {
+    final seq = ++_speakSeq;
     setState(() {
-      _selectedIndex = blockIndex;
+      _selectedIndex = block.index;
       _isPlaying = false;
     });
     await _tts.stop();
-    await _tts.speak(block.text, onComplete: () {});
-    _scrollListTo(blockIndex);
+    // A newer tap came in while we were stopping — let it speak instead.
+    if (seq != _speakSeq) return;
+    await _tts.speak(block.text, language: widget.response.language, onComplete: () {});
+    _scrollListTo(block);
   }
 
-  void _scrollListTo(int index) {
+  void _scrollListTo(OcrBlock block) {
     if (!_listController.hasClients) return;
-    final target = (index * _itemHeight)
+    final pos = widget.response.blocks.indexOf(block);
+    if (pos < 0) return;
+    final target = (pos * _itemHeight)
         .clamp(0.0, _listController.position.maxScrollExtent);
     _listController.animateTo(
       target,
@@ -211,7 +217,11 @@ class _OcrResultScreenState extends State<OcrResultScreen> {
                   showLabels: _showLabels,
                 ),
               ),
-            // Transparent tap targets aligned to each bbox
+            // Tap targets — one per block.
+            // Sorted so the block closest to the image origin is LAST in the
+            // Stack (highest z-order). Flutter's hit testing walks children
+            // from last to first and stops at the first match, so the
+            // closest-to-origin block always wins when bboxes overlap.
             LayoutBuilder(builder: (context, constraints) {
             final widgetSize =
                 Size(constraints.maxWidth, constraints.maxHeight);
@@ -224,9 +234,16 @@ class _OcrResultScreenState extends State<OcrResultScreen> {
             final offsetY =
                 (widgetSize.height - imageSize.height * scale) / 2;
 
+            // Descending sort: far-from-origin blocks first, close blocks last.
+            final sorted = [...blocksWithBbox]..sort((a, b) {
+                final da = a.bbox!.x * a.bbox!.x + a.bbox!.y * a.bbox!.y;
+                final db = b.bbox!.x * b.bbox!.x + b.bbox!.y * b.bbox!.y;
+                return db.compareTo(da);
+              });
+
             return Stack(
               children: [
-                for (final block in blocksWithBbox)
+                for (final block in sorted)
                   Positioned(
                     left: block.bbox!.x * scale + offsetX,
                     top: block.bbox!.y * scale + offsetY,
@@ -234,7 +251,7 @@ class _OcrResultScreenState extends State<OcrResultScreen> {
                     height: block.bbox!.height * scale,
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,
-                      onTap: () => _readBlock(block.index),
+                      onTap: () => _readBlock(block),
                       child: const SizedBox.expand(),
                     ),
                   ),
@@ -282,7 +299,7 @@ class _OcrResultScreenState extends State<OcrResultScreen> {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () => _readBlock(block.index),
+        onTap: () => _readBlock(block),
         splashColor: const Color(0xFF4A90E2).withOpacity(0.1),
         highlightColor: const Color(0xFF4A90E2).withOpacity(0.06),
         child: AnimatedContainer(

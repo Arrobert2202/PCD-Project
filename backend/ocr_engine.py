@@ -19,7 +19,7 @@ EASYOCR_LANG_MAP = {
     "en": "en", "fr": "fr", "de": "de", "es": "es", "pt": "pt",
     "it": "it", "nl": "nl", "pl": "pl", "ru": "ru", "ar": "ar",
     "zh": "ch_sim", "ja": "ja", "ko": "ko", "ro": "ro",
-    "sv": "sv", "tr": "tr", "eu": "eu", "lv": "lv",
+    "sv": "sv", "tr": "tr", "lv": "lv",
 }
 
 # ISO 639-1 → PaddleOCR lang codes

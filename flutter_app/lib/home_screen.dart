@@ -2,10 +2,12 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'ocr_service.dart';
 import 'ocr_result_screen.dart';
+import 'tts_service.dart';
 import 'config.dart';
 
 enum AppState { ready, loading, error }
@@ -20,12 +22,12 @@ class _LangOption {
 const _kLanguages = [
   _LangOption('auto', 'Auto-detect',          '🌐'),
   _LangOption('en',   'English',              '🇬🇧'),
-  _LangOption('ro',   'Romanian',             '🇷🇴'),
   _LangOption('fr',   'French',               '🇫🇷'),
   _LangOption('de',   'German',               '🇩🇪'),
   _LangOption('es',   'Spanish',              '🇪🇸'),
   _LangOption('pt',   'Portuguese',           '🇵🇹'),
   _LangOption('it',   'Italian',              '🇮🇹'),
+  _LangOption('ro',   'Romanian',             '🇷🇴'),
   _LangOption('nl',   'Dutch',                '🇳🇱'),
   _LangOption('pl',   'Polish',               '🇵🇱'),
   _LangOption('ru',   'Russian',              '🇷🇺'),
@@ -35,11 +37,28 @@ const _kLanguages = [
   _LangOption('ko',   'Korean',               '🇰🇷'),
   _LangOption('sv',   'Swedish',              '🇸🇪'),
   _LangOption('tr',   'Turkish',              '🇹🇷'),
-  _LangOption('eu',   'Basque',               '🏴'),
   _LangOption('lv',   'Latvian',              '🇱🇻'),
 ];
 
-class _LanguageMenu extends StatelessWidget {
+String _engineLabel(String engine) => switch (engine) {
+  'easyocr'   => 'EasyOCR',
+  'tesseract' => 'Tesseract',
+  'paddleocr' => 'PaddleOCR',
+  _           => engine,
+};
+
+// Engine IDs that do NOT support the given language.
+// Languages absent from this map are supported by all three engines.
+const _kUnsupportedEngines = <String, List<String>>{
+  'ro': ['paddleocr'],
+  'nl': ['paddleocr'],
+  'pl': ['paddleocr'],
+  'sv': ['paddleocr'],
+  'tr': ['paddleocr'],
+  'lv': ['tesseract', 'paddleocr'],
+};
+
+class _LanguageMenu extends StatefulWidget {
   final String selected;
   final ScrollController scrollController;
   final void Function(String) onSelected;
@@ -51,6 +70,80 @@ class _LanguageMenu extends StatelessWidget {
   });
 
   @override
+  State<_LanguageMenu> createState() => _LanguageMenuState();
+}
+
+class _LanguageMenuState extends State<_LanguageMenu>
+    with WidgetsBindingObserver {
+  final _tts = FlutterTts();
+  // null = still checking, true = available, false = not installed
+  final Map<String, bool?> _availability = {};
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _checkAll();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Re-check when user returns from TTS settings on Android.
+    if (state == AppLifecycleState.resumed) _checkAll();
+  }
+
+  Future<void> _checkAll() async {
+    for (final lang in _kLanguages) {
+      if (lang.code == 'auto') {
+        if (mounted) setState(() => _availability['auto'] = true);
+        continue;
+      }
+      final locale = TtsService.localeFor(lang.code);
+      final ok = await _tts.isLanguageAvailable(locale) ?? false;
+      if (mounted) setState(() => _availability[lang.code] = ok);
+    }
+  }
+
+  Future<void> _requestDownload(String langCode) async {
+    if (!mounted) return;
+    final instructions = Platform.isAndroid
+        ? 'Open your device Settings → General management → '
+          'Language and input → Text-to-speech output → '
+          'Google Text-to-speech Engine → Settings → Install voice data, '
+          'then select the language to download.'
+        : 'Open Settings → Accessibility → Spoken Content → Voices, '
+          'find the language, and tap Download.';
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A2E),
+        shape:
+            RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Install Voice Pack',
+            style: TextStyle(color: Colors.white)),
+        content: Text(
+          instructions,
+          style:
+              TextStyle(color: Colors.white.withOpacity(0.75), height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK',
+                style: TextStyle(color: Color(0xFF4A90E2))),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
@@ -59,7 +152,6 @@ class _LanguageMenu extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // drag handle
           Padding(
             padding: const EdgeInsets.only(top: 10, bottom: 4),
             child: Container(
@@ -71,7 +163,6 @@ class _LanguageMenu extends StatelessWidget {
               ),
             ),
           ),
-          // title
           Padding(
             padding:
                 const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -94,18 +185,21 @@ class _LanguageMenu extends StatelessWidget {
             ),
           ),
           Divider(color: Colors.white.withOpacity(0.07), height: 1),
-          // list
           Expanded(
             child: ListView.builder(
-              controller: scrollController,
+              controller: widget.scrollController,
               itemCount: _kLanguages.length,
               itemBuilder: (_, i) {
                 final lang = _kLanguages[i];
-                final isSelected = lang.code == selected;
+                final isSelected = lang.code == widget.selected;
                 return _LanguageTile(
                   lang: lang,
                   isSelected: isSelected,
-                  onTap: () => onSelected(lang.code),
+                  ttsAvailable: _availability[lang.code],
+                  onTap: () => widget.onSelected(lang.code),
+                  onDownload: lang.code == 'auto'
+                      ? null
+                      : () => _requestDownload(lang.code),
                 );
               },
             ),
@@ -120,12 +214,17 @@ class _LanguageMenu extends StatelessWidget {
 class _LanguageTile extends StatelessWidget {
   final _LangOption lang;
   final bool isSelected;
+  // null = still checking, true = pack installed, false = not installed
+  final bool? ttsAvailable;
   final VoidCallback onTap;
+  final VoidCallback? onDownload;
 
   const _LanguageTile({
     required this.lang,
     required this.isSelected,
+    required this.ttsAvailable,
     required this.onTap,
+    this.onDownload,
   });
 
   @override
@@ -174,17 +273,33 @@ class _LanguageTile extends StatelessWidget {
                 ),
                 const SizedBox(width: 14),
                 Expanded(
-                  child: Text(
-                    lang.name,
-                    style: TextStyle(
-                      color: isSelected
-                          ? const Color(0xFF4A90E2)
-                          : Colors.white.withOpacity(0.9),
-                      fontSize: 14,
-                      fontWeight: isSelected
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                    ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        lang.name,
+                        style: TextStyle(
+                          color: isSelected
+                              ? const Color(0xFF4A90E2)
+                              : Colors.white.withOpacity(0.9),
+                          fontSize: 14,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                        ),
+                      ),
+                      if (_kUnsupportedEngines.containsKey(lang.code)) ...[
+                        const SizedBox(height: 2),
+                        Text(
+                          'Not supported: ${_kUnsupportedEngines[lang.code]!.map(_engineLabel).join(' · ')}',
+                          style: TextStyle(
+                            color: Colors.orangeAccent.withOpacity(0.8),
+                            fontSize: 10,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 Text(
@@ -196,13 +311,56 @@ class _LanguageTile extends StatelessWidget {
                     letterSpacing: 0.5,
                   ),
                 ),
+                const SizedBox(width: 8),
+                _buildTtsStatus(),
                 if (isSelected) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
                   const Icon(Icons.check_rounded,
                       color: Color(0xFF4A90E2), size: 18),
                 ],
               ],
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTtsStatus() {
+    if (lang.code == 'auto') return const SizedBox.shrink();
+
+    if (ttsAvailable == null) {
+      return SizedBox(
+        width: 14,
+        height: 14,
+        child: CircularProgressIndicator(
+          strokeWidth: 1.5,
+          color: Colors.white.withOpacity(0.25),
+        ),
+      );
+    }
+
+    if (ttsAvailable!) {
+      return Tooltip(
+        message: 'Voice pack installed',
+        child: Icon(Icons.volume_up_rounded,
+            size: 16, color: Colors.greenAccent.withOpacity(0.65)),
+      );
+    }
+
+    return Tooltip(
+      message: 'Voice pack not installed — tap for instructions',
+      child: GestureDetector(
+        onTap: onDownload,
+        behavior: HitTestBehavior.opaque,
+        child: Padding(
+          padding: const EdgeInsets.all(2),
+          child: Icon(
+            Platform.isAndroid
+                ? Icons.download_rounded
+                : Icons.info_outline_rounded,
+            size: 16,
+            color: Colors.orangeAccent.withOpacity(0.85),
           ),
         ),
       ),
@@ -695,6 +853,32 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  Widget _buildEngineCompatWarning() {
+    final unsupported = _kUnsupportedEngines[_lang];
+    if (unsupported == null || !unsupported.contains(_engine)) {
+      return const SizedBox.shrink();
+    }
+    final langName = _kLanguages.firstWhere((l) => l.code == _lang).name;
+    final engineName = _engineLabel(_engine);
+    return Padding(
+      padding: const EdgeInsets.only(top: 8),
+      child: Row(
+        children: [
+          const Icon(Icons.warning_amber_rounded,
+              size: 14, color: Colors.orangeAccent),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              '$langName is not supported by $engineName',
+              style: const TextStyle(
+                  color: Colors.orangeAccent, fontSize: 11),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildOcrOptionsPanel() {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
@@ -719,6 +903,7 @@ class _HomeScreenState extends State<HomeScreen>
           _optionLabel('Language'),
           const SizedBox(height: 8),
           _buildLanguageSelectorButton(),
+          _buildEngineCompatWarning(),
           const SizedBox(height: 14),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
