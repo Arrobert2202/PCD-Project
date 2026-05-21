@@ -28,8 +28,7 @@ REQUEST_TIMEOUT = 120
 SCENARIOS = [
     {"name": "Baseline",  "engine": "tesseract", "fuzzy": False, "lang": "en"},
     {"name": "Optimized", "engine": "easyocr",   "fuzzy": True,  "lang": "en"},
-    {"name": "Optimized", "engine": "paddleocr",   "fuzzy": False,  "lang": "auto"},
-
+    {"name": "Optimized", "engine": "paddleocr",   "fuzzy": False,  "lang": "auto"}
 ]
 
 CSV_COLUMNS = ["image", "scenario", "engine", "fuzzy", "wer", "cer", "latency_s", "status", "detected_language"]
