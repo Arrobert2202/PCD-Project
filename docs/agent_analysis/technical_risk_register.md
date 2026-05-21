@@ -1,0 +1,14 @@
+# Technical Risk Register
+
+| Risk | Cause | Impact | Probability | Severity | Detection method | Mitigation | Fallback plan |
+|---|---|---|---|---|---|---|---|
+| OCR accuracy too low | Noisy scans, weak preprocessing, engine mismatch | Unusable transcripts, poor trust | high | critical | WER/CER trends in `/evaluate` + benchmark scripts | Engine tuning, preprocessing ablations, language handling improvements | Restrict scope to supported document types and disclose limits |
+| Layout extraction weak | Simple contour heuristic only | Incorrect reading order/navigation | medium | major | Visual bbox audits + ordering tests | Improve region detection and ordering rules; add labeled layout mini-set | Use full-image OCR text fallback without spatial navigation |
+| PDF support incomplete | UI allows PDF, backend accepts only JPEG/PNG | User-facing errors and confusion | high | major | Test PDF upload path end-to-end | Add PDF-to-image conversion or disable PDF selection | Show clear “PDF unsupported” message and guidance |
+| Inaccessible UI interactions | Limited navigation model | Reduced usability for target users | medium | major | Accessibility walkthrough (TalkBack/VoiceOver tasks) | Add next/prev block controls and uncertainty prompts | Provide simplified linear read-all mode |
+| No meaningful audio navigation | Only basic block taps/read-all | Accessibility objective partially unmet | medium | major | Task-based navigation tests | Add structured navigation controls (section/block jumps) | Keep read-all + searchable text fallback |
+| No baseline rigor | Baseline definition undocumented/unstable | Weak academic comparison validity | medium | major | Review benchmark config consistency | Freeze baseline config and publish protocol | Report exploratory results with explicit caveats |
+| No evaluation data quality assurance | Irregular GT format and uncertain provenance | Invalid/biased metrics | medium | critical | Ground-truth parser sanity checks, spot audits | Normalize GT schema and dataset manifest | Use manually verified small validation set |
+| Privacy leakage | OCR text and GT logged to disk | Sensitive data exposure | high | critical | Log inspection (`backend/logs/backend.log`) | Redact logs, opt-in debug logging, retention policy | Disable verbose logging entirely in demo mode |
+| Dependency installation failures | Heavy OCR stack + missing system tools | Setup blocked, non-reproducible demos | high | major | Fresh machine install attempt | Add environment matrix + setup scripts + preflight checks | Run limited engine subset on known working machine |
+| Scope too large for remaining time | Combining OCR, layout, accessibility, eval, paper | Incomplete deliverables | high | critical | Weekly milestone burn-down review | Prioritize minimum publishable prototype + evidence | De-scope advanced features; focus on eval + accessibility core |
