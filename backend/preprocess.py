@@ -8,6 +8,9 @@ from typing import Optional, Tuple
 
 _DEBUG = os.environ.get("OCR_DEBUG", "0") == "1"
 _DEBUG_DIR = Path(__file__).parent / "debug"
+_MAX_WORKING_SIDE = int(os.environ.get("OCR_MAX_WORKING_SIDE", "1800"))
+_MAX_WORKING_PIXELS = int(os.environ.get("OCR_MAX_WORKING_PIXELS", "2500000"))
+_JPEG_QUALITY = int(os.environ.get("OCR_PREPROCESS_JPEG_QUALITY", "85"))
 
 
 @dataclass
@@ -16,12 +19,14 @@ class PreprocessTransform:
     space) can be mapped back to original image space.
 
     Transform order applied during preprocessing:
-      1. upscale   (scale factor applied to both axes)
-      2. deskew    (rotation around image centre)
+      1. downscale (only when the original upload is too large)
+      2. upscale   (only when estimated character height is too small)
+      3. deskew    (rotation around image centre)
 
     Inverse order to recover original coords:
-      undo deskew → undo upscale
+      undo deskew -> undo upscale -> undo downscale
     """
+    input_scale: float         # original upload -> working image scale; 1 = no-op
     upscale_factor: float
     deskew_angle: float        # degrees passed to getRotationMatrix2D; 0 = no-op
     deskew_center_x: float     # rotation centre in the upscaled image
@@ -48,8 +53,8 @@ class PreprocessTransform:
             fx, fy = min(xs), min(ys)
             fw, fh = max(xs) - fx, max(ys) - fy
 
-        # 3. undo upscale
-        f = self.upscale_factor
+        # 2/3. undo upscale and initial downscale
+        f = self.input_scale * self.upscale_factor
         return (
             int(round(fx / f)),
             int(round(fy / f)),
@@ -70,29 +75,74 @@ def _rotate_point(
 def preprocess_image(
     image_bytes: bytes,
 ) -> Tuple[bytes, PreprocessTransform]:
-    nparr = np.frombuffer(image_bytes, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    img = _decode_image(image_bytes)
 
     img, upscale_factor = _normalize_scale(img)
     img, deskew_angle, deskew_center = _deskew(img)
     _dbg(img, "deskewed")
 
-    _, buf = cv2.imencode(".png", img)
+    image_bytes = _encode_jpeg(img)
     transform = PreprocessTransform(
+        input_scale=input_scale,
         upscale_factor=upscale_factor,
         deskew_angle=deskew_angle,
         deskew_center_x=deskew_center[0],
         deskew_center_y=deskew_center[1],
     )
-    return buf.tobytes(), transform
+    return image_bytes, transform
+
+
+def _decode_image(image_bytes: bytes) -> np.ndarray:
+    nparr = np.frombuffer(image_bytes, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    if img is None:
+        raise ValueError("Could not decode image data.")
+    return img
+
+
+def _encode_jpeg(img: np.ndarray) -> bytes:
+    ok, buf = cv2.imencode(
+        ".jpg",
+        img,
+        [int(cv2.IMWRITE_JPEG_QUALITY), _JPEG_QUALITY],
+    )
+    if not ok:
+        raise ValueError("Could not encode preprocessed image.")
+    return buf.tobytes()
+
+
+def _limit_scale(h: int, w: int) -> float:
+    scale = 1.0
+    max_side = max(h, w)
+    if _MAX_WORKING_SIDE > 0 and max_side > _MAX_WORKING_SIDE:
+        scale = min(scale, _MAX_WORKING_SIDE / max_side)
+    pixels = h * w
+    if _MAX_WORKING_PIXELS > 0 and pixels > _MAX_WORKING_PIXELS:
+        scale = min(scale, math.sqrt(_MAX_WORKING_PIXELS / pixels))
+    return scale
+
+
+def _downscale_if_large(img: np.ndarray) -> Tuple[np.ndarray, float]:
+    h, w = img.shape[:2]
+    scale = _limit_scale(h, w)
+    if scale >= 1.0:
+        return img, 1.0
+
+    new_w = max(1, int(round(w * scale)))
+    new_h = max(1, int(round(h * scale)))
+    return cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA), scale
 
 
 def _dbg(img: np.ndarray, name: str) -> None:
+    if not _DEBUG:
+        return
     _DEBUG_DIR.mkdir(exist_ok=True)
     cv2.imwrite(str(_DEBUG_DIR / f"{name}.png"), img)
 
 
 def dbg_boxes(image_bytes: bytes, raw: list) -> None:
+    if not _DEBUG:
+        return
     nparr = np.frombuffer(image_bytes, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
     for text, _, b in raw:

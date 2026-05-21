@@ -31,13 +31,17 @@ from typing import Optional
 
 import kaggle
 import requests
-from PIL import Image
+from PIL import Image, ImageOps
 
 # ── defaults ────────────────────────────────────────────────────────────────
 BACKEND_URL = "http://localhost:8000"
 DEFAULT_DATASET = "ssarkar445/handwriting-recognitionocr"
 IMAGE_EXTS = {".jpg", ".jpeg", ".png"}
 BATCH_SIZE = 16
+MAX_UPLOAD_SIDE = 1800
+MAX_UPLOAD_PIXELS = 2_500_000
+MAX_UPLOAD_BYTES = 1_500_000
+UPLOAD_JPEG_QUALITY = 85
 
 
 # ── dataset download ─────────────────────────────────────────────────────────
@@ -239,9 +243,50 @@ def _pick(originals, lowered, candidates):
 
 def encode_image(path: Path) -> Optional[str]:
     try:
-        return base64.b64encode(path.read_bytes()).decode()
+        data = _prepare_upload_image(path)
+        return base64.b64encode(data).decode()
     except Exception:
         return None
+
+
+def _prepare_upload_image(path: Path) -> bytes:
+    original = path.read_bytes()
+
+    with Image.open(path) as img:
+        img = ImageOps.exif_transpose(img)
+        scale = _upload_scale(img.width, img.height)
+
+        if scale >= 1.0 and len(original) <= MAX_UPLOAD_BYTES:
+            return original
+
+        if scale < 1.0:
+            img = img.resize(
+                (
+                    max(1, int(round(img.width * scale))),
+                    max(1, int(round(img.height * scale))),
+                ),
+                Image.Resampling.LANCZOS,
+            )
+
+        if img.mode != "RGB":
+            img = img.convert("RGB")
+
+        buf = io.BytesIO()
+        img.save(buf, format="JPEG", quality=UPLOAD_JPEG_QUALITY)
+        return buf.getvalue()
+
+
+def _upload_scale(width: int, height: int) -> float:
+    scale = 1.0
+    max_side = max(width, height)
+    if max_side > MAX_UPLOAD_SIDE:
+        scale = min(scale, MAX_UPLOAD_SIDE / max_side)
+
+    pixels = width * height
+    if pixels > MAX_UPLOAD_PIXELS:
+        scale = min(scale, (MAX_UPLOAD_PIXELS / pixels) ** 0.5)
+
+    return scale
 
 
 def run_evaluation(pairs: list, engine: str, lang: str, url: str) -> list[dict]:

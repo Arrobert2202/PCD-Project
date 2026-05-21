@@ -235,7 +235,10 @@ def _run_engine(engine: str, image_bytes: bytes, ocr_lang: str):
 
 
 def _process_image(image_bytes: bytes, engine: str, lang: str = "auto", fuzzy: bool = False, fuzzer: str = "symspell") -> OCRResponse:
-    image_bytes, transform = preprocess_image(image_bytes)
+    try:
+        image_bytes, transform = preprocess_image(image_bytes)
+    except ValueError as e:
+        raise HTTPException(status_code=422, detail=str(e))
 
     ocr_lang = "en" if lang == "auto" else lang
 
