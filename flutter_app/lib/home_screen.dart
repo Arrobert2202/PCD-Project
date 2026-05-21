@@ -164,22 +164,24 @@ class _LanguageMenuState extends State<_LanguageMenu>
             ),
           ),
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
             child: Row(
               children: [
                 const Text(
                   'Select Language',
                   style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600),
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
                 const Spacer(),
                 Text(
                   '${_kLanguages.length} languages',
                   style: TextStyle(
-                      color: Colors.white.withOpacity(0.35), fontSize: 12),
+                    color: Colors.white.withOpacity(0.35),
+                    fontSize: 12,
+                  ),
                 ),
               ],
             ),
@@ -265,7 +267,7 @@ class _LanguageTile extends StatelessWidget {
                       fontSize: 24,
                       fontFamilyFallback: [
                         'Apple Color Emoji',
-                        'Noto Color Emoji'
+                        'Noto Color Emoji',
                       ],
                     ),
                     textAlign: TextAlign.center,
@@ -416,7 +418,12 @@ class _HomeScreenState extends State<HomeScreen>
   Future<void> _captureFromCamera() async {
     XFile? photo;
     try {
-      photo = await _picker.pickImage(source: ImageSource.camera);
+      photo = await _picker.pickImage(
+        source: ImageSource.camera,
+        maxWidth: kOcrMaxUploadSide.toDouble(),
+        maxHeight: kOcrMaxUploadSide.toDouble(),
+        imageQuality: kOcrUploadJpegQuality,
+      );
     } catch (e) {
       _setError('camera unavailable or permission denied');
       return;
@@ -455,7 +462,8 @@ class _HomeScreenState extends State<HomeScreen>
         fuzzy: _fuzzy,
         fuzzer: _fuzzer,
       );
-      final response = await _ocr.processBytes(imageBytes, options);
+      final result = await _ocr.processBytes(imageBytes, options);
+      final response = result.response;
 
       if (response.status == 'no_text_detected' || response.blocks.isEmpty) {
         _setError('no text was detected');
@@ -464,14 +472,14 @@ class _HomeScreenState extends State<HomeScreen>
 
       setState(() {
         _state = AppState.ready;
-        _lastImageBytes = imageBytes;
+        _lastImageBytes = result.imageBytes;
       });
       if (!mounted) return;
       await Navigator.push(
         context,
         MaterialPageRoute(
           builder: (_) => OcrResultScreen(
-            imageBytes: imageBytes,
+            imageBytes: result.imageBytes,
             response: response,
           ),
         ),
@@ -539,7 +547,9 @@ class _HomeScreenState extends State<HomeScreen>
               Text(
                 'scan & listen',
                 style: TextStyle(
-                    color: Colors.white.withOpacity(0.5), fontSize: 12),
+                  color: Colors.white.withOpacity(0.5),
+                  fontSize: 12,
+                ),
               ),
             ],
           ),
@@ -554,8 +564,11 @@ class _HomeScreenState extends State<HomeScreen>
                   color: Colors.white.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.settings_outlined,
-                    color: Colors.white, size: 24),
+                child: const Icon(
+                  Icons.settings_outlined,
+                  color: Colors.white,
+                  size: 24,
+                ),
               ),
             ),
           ),
@@ -658,30 +671,41 @@ class _HomeScreenState extends State<HomeScreen>
             width: 32,
             height: 32,
             child: CircularProgressIndicator(
-                color: Colors.white, strokeWidth: 3),
+              color: Colors.white,
+              strokeWidth: 3,
+            ),
           ),
           text: 'Analysing document...',
           color: const Color(0xFF0F3460),
         );
       case AppState.error:
         return _statusCard(
-          icon: const Icon(Icons.error_outline_rounded,
-              color: Colors.redAccent, size: 32),
+          icon: const Icon(
+            Icons.error_outline_rounded,
+            color: Colors.redAccent,
+            size: 32,
+          ),
           text: _error,
           color: const Color(0xFF3B0D0D),
         );
       case AppState.ready:
         return _statusCard(
-          icon: Icon(Icons.document_scanner_outlined,
-              color: Colors.white.withOpacity(0.7), size: 32),
+          icon: Icon(
+            Icons.document_scanner_outlined,
+            color: Colors.white.withOpacity(0.7),
+            size: 32,
+          ),
           text: 'Take a photo or upload a file to get started',
           color: Colors.white.withOpacity(0.05),
         );
     }
   }
 
-  Widget _statusCard(
-      {required Widget icon, required String text, required Color color}) {
+  Widget _statusCard({
+    required Widget icon,
+    required String text,
+    required Color color,
+  }) {
     return Semantics(
       label: text,
       child: Container(
@@ -700,7 +724,10 @@ class _HomeScreenState extends State<HomeScreen>
               child: Text(
                 text,
                 style: const TextStyle(
-                    color: Colors.white, fontSize: 15, height: 1.4),
+                  color: Colors.white,
+                  fontSize: 15,
+                  height: 1.4,
+                ),
               ),
             ),
           ],
@@ -768,9 +795,10 @@ class _HomeScreenState extends State<HomeScreen>
             boxShadow: onTap != null
                 ? [
                     BoxShadow(
-                        color: color.withOpacity(0.4),
-                        blurRadius: 24,
-                        spreadRadius: 4)
+                      color: color.withOpacity(0.4),
+                      blurRadius: 24,
+                      spreadRadius: 4,
+                    ),
                   ]
                 : [],
           ),
@@ -779,11 +807,14 @@ class _HomeScreenState extends State<HomeScreen>
             children: [
               Icon(icon, color: Colors.white, size: 44),
               const SizedBox(height: 8),
-              Text(label,
-                  style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600)),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
         ),
@@ -792,8 +823,10 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Widget _buildLanguageSelectorButton() {
-    final current = _kLanguages.firstWhere((l) => l.code == _lang,
-        orElse: () => _kLanguages.first);
+    final current = _kLanguages.firstWhere(
+      (l) => l.code == _lang,
+      orElse: () => _kLanguages.first,
+    );
     return Semantics(
       label: 'selected language: ${current.name}',
       button: true,
@@ -804,26 +837,33 @@ class _HomeScreenState extends State<HomeScreen>
           decoration: BoxDecoration(
             color: const Color(0xFF4A90E2).withOpacity(0.12),
             borderRadius: BorderRadius.circular(10),
-            border:
-                Border.all(color: const Color(0xFF4A90E2).withOpacity(0.4)),
+            border: Border.all(color: const Color(0xFF4A90E2).withOpacity(0.4)),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(current.flag,
-                  style: const TextStyle(fontSize: 20,
-                      fontFamilyFallback: ['Apple Color Emoji', 'Noto Color Emoji'])),
+              Text(
+                current.flag,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontFamilyFallback: ['Apple Color Emoji', 'Noto Color Emoji'],
+                ),
+              ),
               const SizedBox(width: 8),
               Text(
                 current.name,
                 style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500),
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
               const SizedBox(width: 6),
-              Icon(Icons.expand_more_rounded,
-                  color: Colors.white.withOpacity(0.55), size: 18),
+              Icon(
+                Icons.expand_more_rounded,
+                color: Colors.white.withOpacity(0.55),
+                size: 18,
+              ),
             ],
           ),
         ),
@@ -977,14 +1017,14 @@ class _HomeScreenState extends State<HomeScreen>
                     : FontWeight.normal,
               ),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8)),
+                borderRadius: BorderRadius.circular(8),
+              ),
               side: BorderSide(
                 color: selected == options[i]
                     ? const Color(0xFF4A90E2)
                     : Colors.white.withOpacity(0.12),
               ),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               visualDensity: VisualDensity.compact,
             ),
           ),
@@ -1004,17 +1044,17 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _showSettings() {
     final hostCtrl = TextEditingController(text: BackendConfig.host);
-    final portCtrl =
-        TextEditingController(text: BackendConfig.port.toString());
+    final portCtrl = TextEditingController(text: BackendConfig.port.toString());
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF1A1A2E),
-        shape:
-            RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Backend Settings',
-            style: TextStyle(color: Colors.white)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: const Text(
+          'Backend Settings',
+          style: TextStyle(color: Colors.white),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1025,17 +1065,16 @@ class _HomeScreenState extends State<HomeScreen>
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'IP Address',
-                  labelStyle:
-                      TextStyle(color: Colors.white.withOpacity(0.6)),
+                  labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide:
-                        BorderSide(color: Colors.white.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                      color: Colors.white.withOpacity(0.2),
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide:
-                        const BorderSide(color: Color(0xFF4A90E2)),
+                    borderSide: const BorderSide(color: Color(0xFF4A90E2)),
                   ),
                 ),
                 keyboardType: TextInputType.number,
@@ -1049,17 +1088,16 @@ class _HomeScreenState extends State<HomeScreen>
                 style: const TextStyle(color: Colors.white),
                 decoration: InputDecoration(
                   labelText: 'Port',
-                  labelStyle:
-                      TextStyle(color: Colors.white.withOpacity(0.6)),
+                  labelStyle: TextStyle(color: Colors.white.withOpacity(0.6)),
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide:
-                        BorderSide(color: Colors.white.withOpacity(0.2)),
+                    borderSide: BorderSide(
+                      color: Colors.white.withOpacity(0.2),
+                    ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide:
-                        const BorderSide(color: Color(0xFF4A90E2)),
+                    borderSide: const BorderSide(color: Color(0xFF4A90E2)),
                   ),
                 ),
                 keyboardType: TextInputType.number,
@@ -1070,19 +1108,21 @@ class _HomeScreenState extends State<HomeScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Cancel',
-                style: TextStyle(color: Colors.white.withOpacity(0.6))),
+            child: Text(
+              'Cancel',
+              style: TextStyle(color: Colors.white.withOpacity(0.6)),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF4A90E2),
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
             ),
             onPressed: () {
               BackendConfig.host = hostCtrl.text.trim();
-              BackendConfig.port =
-                  int.tryParse(portCtrl.text.trim()) ?? 8000;
+              BackendConfig.port = int.tryParse(portCtrl.text.trim()) ?? 8000;
               Navigator.pop(ctx);
             },
             child: const Text('Save'),
