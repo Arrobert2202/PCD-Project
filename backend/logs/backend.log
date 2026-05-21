@@ -1,0 +1,2001 @@
+2026-05-21 19:15:17 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:15:18 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:15:18 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=1.163s
+2026-05-21 19:15:20 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:15:20 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:15:20 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=0.288s
+2026-05-21 19:15:22 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:15:27 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:15:27 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=4.857s
+2026-05-21 19:15:29 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:15:30 | [OCR full text]
+901016 -TICKET CP
+60,000 £0,000
+TOTAL DISS $ -h0 000
+TAX 5 455
+Subtotal 0.000
+TOTAL caty 2.00 60,000
+- EDC CIMB NIAGA No: xx7730 60.000
+eherToNMcodD THEA
+2026-05-21 19:15:30 | [Ground truth]
+901016 -TICKET CP
+2 60.000 60.000
+TOTAL DISC $ -60.000
+TAX 5.455
+Subtotal 60.000
+TOTAL (Qty 2.00 60.000
+EDC CIMB NIAGA No: xx7730 60.000
+2026-05-21 19:15:30 | response | status=ok  lang=en  WER=77.78%  CER=24.26%  elapsed=0.814s
+2026-05-21 19:15:32 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:15:34 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:15:40 | [OCR full text]
+-TICKET CP
+901016
+60.000
+C0.000
+2
+TOTAL DISC$
+-60.000
+TAX
+5.455
+Subtotal
+60.000
+TOTALQty 2.00 60.000
+60.000
+EDC CIMB NIAGA No:xx7730
+CUSTONERINEO
+2026-05-21 19:15:40 | [Ground truth]
+901016 -TICKET CP
+2 60.000 60.000
+TOTAL DISC $ -60.000
+TAX 5.455
+Subtotal 60.000
+TOTAL (Qty 2.00 60.000
+EDC CIMB NIAGA No: xx7730 60.000
+2026-05-21 19:15:40 | response | status=ok  lang=yo  WER=77.78%  CER=33.09%  elapsed=5.544s
+2026-05-21 19:15:42 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:15:44 | [OCR full text]
+oF
+Ca lie s
+~ tS ‘eke
+~““Ce@
+= =
+1) Q)
+3 a
+o-oo
+et i
+, > . ne (_)
+2026-05-21 19:15:44 | [Ground truth]
+J.STB PROMO 17500
+Y.B.BAT 46000
+Y.BASO PROM 27500
+TOTAL 91000
+CASH 91000
+2026-05-21 19:15:44 | response | status=ok  lang=en  WER=162.50%  CER=90.28%  elapsed=1.680s
+2026-05-21 19:15:46 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:15:48 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:15:50 | [OCR full text]
+J.STB PRONO
+17500
+Y.B.BAT
+46000
+27500
+Y.BASO PROM
+91000
+TOTAL
+91000
+CASH
+2026-05-21 19:15:50 | [Ground truth]
+J.STB PROMO 17500
+Y.B.BAT 46000
+Y.BASO PROM 27500
+TOTAL 91000
+CASH 91000
+2026-05-21 19:15:50 | response | status=ok  lang=en  WER=87.50%  CER=27.78%  elapsed=1.608s
+2026-05-21 19:15:52 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:15:54 | [OCR full text]
+13 1S Ete 24,000
+Fak
+hy
+SUB [UTA
+IOTAL SAPES
+TOTAL TIONS
+CASH
+CHANGE
+NU] JELLY CL} 4,000
+at
+28,000
+4)
+26,000
+|
+100,00
+2026-05-21 19:15:54 | [Ground truth]
+1 JASMINE MT ( L ) 24,000
+COCONUT JELLY ( L ) 4,000
+SUB TOTAL 28,000
+TOTAL SAI S 28,000
+TOTAL ITEMS 1
+CASH 100,000
+CHANGE 72,000
+2026-05-21 19:15:54 | response | status=ok  lang=en  WER=95.24%  CER=79.69%  elapsed=1.781s
+2026-05-21 19:15:56 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:15:58 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:16:00 | [OCR full text]
+SMINE MTL
+1
+24.000
+CONUT JELLYL
+4.000
+SUB TOTA
+28,000
+TOTAL SALES
+28.000
+TOTAL ILS
+1
+100.000
+CASH
+72.000
+CHANGE
+weue No:
+2026-05-21 19:16:00 | [Ground truth]
+1 JASMINE MT ( L ) 24,000
+COCONUT JELLY ( L ) 4,000
+SUB TOTAL 28,000
+TOTAL SAI S 28,000
+TOTAL ITEMS 1
+CASH 100,000
+CHANGE 72,000
+2026-05-21 19:16:00 | response | status=ok  lang=en  WER=100.00%  CER=39.84%  elapsed=1.331s
+2026-05-21 19:16:02 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:16:04 | [OCR full text]
+Dyer
+@11000
+1X
+DONAT GULA 11,000
+1 OOxITEMS
+SUBTOTAL 11,000
+TOTAL 11,000
+11,000
+2026-05-21 19:16:04 | [Ground truth]
+1X @11000
+DONAT GULA 11,000
+1.00xITEMs
+SUBTOTAL 11,000
+TOTAL 11,000
+CASH 11,000
+2026-05-21 19:16:04 | response | status=ok  lang=en  WER=85.71%  CER=21.52%  elapsed=1.881s
+2026-05-21 19:16:06 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:16:08 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:16:10 | [OCR full text]
+D
+Bohoryct
+Hm
+@11000
+1X
+11,000
+DONAT GULA
+1.00xITEMs
+11,000
+SUBTOTAL
+11,000
+TOTAL
+11,000
+CASH
+2026-05-21 19:16:10 | [Ground truth]
+1X @11000
+DONAT GULA 11,000
+1.00xITEMs
+SUBTOTAL 11,000
+TOTAL 11,000
+CASH 11,000
+2026-05-21 19:16:10 | response | status=ok  lang=en  WER=100.00%  CER=59.49%  elapsed=1.547s
+2026-05-21 19:16:12 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:16:14 | [Ground truth]
+ICE BLACKCOFFE 2 82,000
+AVOCADO COFFEE 1 61,000
+CHIKEN KATSU FF 1 51,000
+SUB_TOTAL 194,000
+DISCOUNT 19,400
+TOTAL 174,600
+CASH 200,000
+CHANGE 25,400
+2026-05-21 19:16:14 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=2.103s
+2026-05-21 19:16:16 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:16:19 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:16:21 | [OCR full text]
+Umo
+aloy
+ICE BLACKCOFFE
+32,000
+AVOCADO COFFEE
+61,000
+CHIKEN KATSUNFF
+51000
+Bby
+49
+SUS TSTAL
+194,000
+19,400
+eR
+TOTAL
+174,600
+CASH
+200,000
+CHANGE
+25,400
+2026-05-21 19:16:21 | [Ground truth]
+ICE BLACKCOFFE 2 82,000
+AVOCADO COFFEE 1 61,000
+CHIKEN KATSU FF 1 51,000
+SUB_TOTAL 194,000
+DISCOUNT 19,400
+TOTAL 174,600
+CASH 200,000
+CHANGE 25,400
+2026-05-21 19:16:21 | response | status=ok  lang=en  WER=100.00%  CER=31.97%  elapsed=1.981s
+2026-05-21 19:16:23 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:16:25 | [OCR full text]
+TRAD KY TOAST CARTE 28. 182
+ITEMS 1.00
+SUBTTL 28. 182
+PB-1 10% 2.818
+TOTAL 31.000
+CASH 31.000
+2026-05-21 19:16:25 | [Ground truth]
+TRAD KY TOAST CARTE 28.182
+ITEMS 1.00
+SUBTTL 28.182
+PB-1 10% 2.818
+TOTAL 31.000
+CASH 31.000
+2026-05-21 19:16:25 | response | status=ok  lang=en  WER=36.36%  CER=2.20%  elapsed=1.664s
+2026-05-21 19:16:27 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:16:29 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:16:31 | [OCR full text]
+TRAD KY TOAST CARTE
+28.182
+ITEMS 1.00
+SUBTTL
+28.182
+PB-1 10%
+2.818
+TOTAL
+31.000
+CASH
+31.000
+2026-05-21 19:16:31 | [Ground truth]
+TRAD KY TOAST CARTE 28.182
+ITEMS 1.00
+SUBTTL 28.182
+PB-1 10% 2.818
+TOTAL 31.000
+CASH 31.000
+2026-05-21 19:16:31 | response | status=ok  lang=en  WER=72.73%  CER=5.49%  elapsed=1.671s
+2026-05-21 19:16:33 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:16:34 | [OCR full text]
+1 2GG TART 13,990
+2 sHOCO CUSARD PASTRY __ 24
+1 2EDBEAN BIEAD 9,000 a
+TOTAL 46 ,000
+CHANGE 4,000
+——— een ee
+7 _ cm
+tii
+2026-05-21 19:16:34 | [Ground truth]
+1 EGG TART 13,000
+2 CHOCO CUS ARD PASTRY 24,000
+1 REDBEAN BREAD 9,000
+TOTAL 46,000
+CASH 50,000
+CHANGE 4,000
+2026-05-21 19:16:34 | response | status=ok  lang=en  WER=120.00%  CER=39.25%  elapsed=0.950s
+2026-05-21 19:16:36 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:16:38 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:16:39 | [OCR full text]
+1GG TART
+13,000
+2CHOCO CUS ARD PASTRY
+24,000
+1 REDBEAN BIEAD
+9,000
+TOTAL
+46,000
+CASH
+50,000
+4,000
+CHANGE
+2026-05-21 19:16:39 | [Ground truth]
+1 EGG TART 13,000
+2 CHOCO CUS ARD PASTRY 24,000
+1 REDBEAN BREAD 9,000
+TOTAL 46,000
+CASH 50,000
+CHANGE 4,000
+2026-05-21 19:16:39 | response | status=ok  lang=en  WER=80.00%  CER=19.63%  elapsed=1.188s
+2026-05-21 19:16:42 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:16:44 | [Ground truth]
+Kupon 15 100,000
+ADD CHICKEN BOX 909
+Subtotal 100,909
+PB1 (10%) 10,091
+Total 111,000
+Cash Rp. 111,000
+2026-05-21 19:16:44 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=2.830s
+2026-05-21 19:16:46 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:16:49 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:16:51 | [OCR full text]
+Kupon 15
+100,000
+909
+Subtotal
+100,909
+PB1(10%)
+10,091
+Total
+111,000
+Cash
+p.111,000
+2026-05-21 19:16:51 | [Ground truth]
+Kupon 15 100,000
+ADD CHICKEN BOX 909
+Subtotal 100,909
+PB1 (10%) 10,091
+Total 111,000
+Cash Rp. 111,000
+2026-05-21 19:16:51 | response | status=ok  lang=so  WER=91.67%  CER=23.76%  elapsed=1.594s
+2026-05-21 19:16:53 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:16:54 | [Ground truth]
+1 [REG] BLACK SAKURA 45,455
+1 COOKIE DOH SAUCES 0
+1 NATA DE COCO 0
+Sub Total 45,455
+PB1 (10%) 4,545
+Rounding 0
+Total 50,000
+Card Payment 50,000
+2026-05-21 19:16:54 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=0.748s
+2026-05-21 19:16:56 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:16:58 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:16:59 | [OCR full text]
+1[REG] BLACK SAKURA
+45,455
+1COOKIE DOH SAUCES
+0
+0
+1 NATA DE COCO
+Sub Total
+45,455
+PB11G%
+4,545
+Rounding
+0
+50,000
+Total
+50,000
+Card Payment
+2026-05-21 19:16:59 | [Ground truth]
+1 [REG] BLACK SAKURA 45,455
+1 COOKIE DOH SAUCES 0
+1 NATA DE COCO 0
+Sub Total 45,455
+PB1 (10%) 4,545
+Rounding 0
+Total 50,000
+Card Payment 50,000
+2026-05-21 19:16:59 | response | status=ok  lang=en  WER=76.19%  CER=20.98%  elapsed=1.219s
+2026-05-21 19:17:01 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:17:03 | [OCR full text]
+on eeremeeenee cannennnnnpens
+eee | ne hen ene es ne ene ot: Pal
+Anes teteenscasmnonmnmr hs het tri ermrcnaemnaen sainnenerneneet se GATS
+hadienpehedihndsetiandedgnassteeaeheeeneaneeneneiateet eee rom
+pacioanretes saonernanet
+posseooanethanaseshapsnousinabertspnivenentsoor’ mass taapenrcnpeann teeta aeRO e SENE, 2 ONT
+Seem seamen ete gn noemmnannnnane’
+Bumbu Kaldu Ayam 1
+36000 36000,
+“ ;
+: Sub Total 38000
+Discount (0 %)
+setemcmsteeteeereteet tn en ee to ia
+Kembalian 14000
+2026-05-21 19:17:03 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:17:03 | response | status=ok  lang=en  WER=600.00%  CER=456.82%  elapsed=1.592s
+2026-05-21 19:17:05 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:17:07 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:17:08 | [OCR full text]
+Bumbu Kaldu Ayam 1
+36000
+36000
+Sub Total
+36000
+Discount 0%
+Trunl
+50000
+Kombalian
+14000
+2026-05-21 19:17:08 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:17:08 | response | status=ok  lang=tl  WER=50.00%  CER=9.09%  elapsed=1.048s
+2026-05-21 19:17:10 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:17:11 | [OCR full text]
+CINNAMON SUGAR
+1 x 17,000 17,000
+SUBTOTAL.) j/iiea. i- daeea ene
+GRAND TOTAL 17,000
+CASHIDR 20,000
+CHANGE DUE 3,000
+2026-05-21 19:17:11 | [Ground truth]
+CINNAMON SUGAR
+1 x 17,000 17,000
+SUB TOTAL 17,000
+GRAND TOTAL 17,000
+CASH IDR 20,000
+CHANGE DUE 3,000
+2026-05-21 19:17:11 | response | status=ok  lang=en  WER=53.85%  CER=23.76%  elapsed=0.956s
+2026-05-21 19:17:13 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:17:16 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:17:17 | [OCR full text]
+AantieAnne's
+CINNAMONSUGAR
+1
+x17,000
+17,000
+SUB TOTAL
+17,000
+GRANDTOTAL
+17,000
+CASHIDR
+20,000
+CHANGEDUE
+3,000
+2026-05-21 19:17:17 | [Ground truth]
+CINNAMON SUGAR
+1 x 17,000 17,000
+SUB TOTAL 17,000
+GRAND TOTAL 17,000
+CASH IDR 20,000
+CHANGE DUE 3,000
+2026-05-21 19:17:17 | response | status=ok  lang=af  WER=100.00%  CER=23.76%  elapsed=1.011s
+2026-05-21 19:17:19 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:17:22 | [Ground truth]
+1 BANABERRY FRESH CREAM CAK 230,000
+TOTAL CASH 230,000 230,000
+CHANGE 0
+2026-05-21 19:17:22 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=3.222s
+2026-05-21 19:17:24 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:17:27 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:17:29 | [OCR full text]
+1 BANABERRY FRESH CREAM CAK230,000
+230,000
+TOTAL
+230,000
+CASH
+0
+CHANGE
+2026-05-21 19:17:29 | [Ground truth]
+1 BANABERRY FRESH CREAM CAK 230,000
+TOTAL CASH 230,000 230,000
+CHANGE 0
+2026-05-21 19:17:29 | response | status=ok  lang=en  WER=60.00%  CER=32.39%  elapsed=1.726s
+2026-05-21 19:17:31 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:17:33 | [Ground truth]
+0571-1854 BLUS WANITA
+1 @120,000 0% 120,000
+1002-0060 SHOPPING BAG
+1 @880 100% 0
+TOTAL (2 item) 120,000
+CC.Visa.BCA 120,000
+Total Kembalian 0
+2026-05-21 19:17:33 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=2.120s
+2026-05-21 19:17:35 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:17:38 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:17:39 | [OCR full text]
+29
+0571-1854BLUS WANITA
+0120,0000%
+120,000
+1002-0060 SHOPPING BAG
+1
+0
+@860100%
+TOTAL 2 item)
+120,000
+CC.Visa.BCA
+120,000
+Total Keabalian
+0
+2026-05-21 19:17:39 | [Ground truth]
+0571-1854 BLUS WANITA
+1 @120,000 0% 120,000
+1002-0060 SHOPPING BAG
+1 @880 100% 0
+TOTAL (2 item) 120,000
+CC.Visa.BCA 120,000
+Total Kembalian 0
+2026-05-21 19:17:39 | response | status=ok  lang=id  WER=94.12%  CER=14.89%  elapsed=1.560s
+2026-05-21 19:17:41 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:17:44 | [OCR full text]
+a ee
+Ih oeres ee ee pereyabornd enol
+Tat netern es enbernraer tien:
+2026-05-21 19:17:44 | [Ground truth]
+BASO KUAH 1 43.636 43.636
+A.MINERAL GELAS 1 3,000 3,000
+TOTAL 46.636
+DPP 46.636
+TAX 10.00 % 4.664
+GRAND TOTAL 51.300
+TUNAI 52.000
+KEMBALI 700
+2026-05-21 19:17:44 | response | status=ok  lang=en  WER=100.00%  CER=90.78%  elapsed=2.272s
+2026-05-21 19:17:46 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:17:48 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:17:51 | [OCR full text]
+ODJOURNEY
+HASDKLWH
+143.636
+43.63
+A.MINERALCOLAS
+13.000
+3.000
+TOTAL
+46.60
+DFP
+46.66
+TAX10.00
+4.6
+51.300
+FUNGE
+TUAAAI
+52.000
+KEMBALT
+700
+2026-05-21 19:17:51 | [Ground truth]
+BASO KUAH 1 43.636 43.636
+A.MINERAL GELAS 1 3,000 3,000
+TOTAL 46.636
+DPP 46.636
+TAX 10.00 % 4.664
+GRAND TOTAL 51.300
+TUNAI 52.000
+KEMBALI 700
+2026-05-21 19:17:51 | response | status=ok  lang=en  WER=100.00%  CER=43.97%  elapsed=2.170s
+2026-05-21 19:17:53 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:17:54 | [OCR full text]
+1 RedVelvet Cheese Sic
+1 Chicken Baked Rice
+i Fish fp Chips
+i Ausmroum Soup
+i Chamomile
+i Iced Tea
+SUBTOTAL
+Service
+PBI ‘
+De a ee mee ee nm et ae ae ee he na a i at
+ee
+CAS
+Change
+238, 000
+17,850
+25 505
+ev St ne ae fn nna as ne a mt wa
+281,435
+100,000
+200,000
+18,565
+a a
+RDS BABS ee ee ne ee et ee ee
+eo nett Oe ete be ons ee oy ae oo
+2026-05-21 19:17:54 | [Ground truth]
+1 RedVelvet Cheese Slc 38,000
+1 Chicken Baked Rice 55,000
+1 Fish n Chips 65,000
+1 Mushroom Soup 35,000
+1 Chamomile 25,000
+1 Iced Tea 20,000
+SUBTOTAL 238,000
+Service 17,850
+PB1 25,585
+TOTAL 281,435
+Coupon 100,000
+CASH 200,000
+Change 18,565
+2026-05-21 19:17:54 | response | status=ok  lang=en  WER=200.00%  CER=99.16%  elapsed=1.710s
+2026-05-21 19:17:56 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:17:59 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:18:01 | [OCR full text]
+1 RedVelvet Cheese Slc
+38000
+Chicken Baked Rice
+55,000
+1 Fish n Chis
+65000
+Mushroom Soup
+35,000
+1 Chamomile
+25,000
+1 Iced Tea
+20000
+SUBTOTAL
+238000
+Service
+17850
+PB1
+25,585
+TOTAL
+281.435
+Coupon
+100,000
+CASH
+200,000
+Change
+18,565
+2026-05-21 19:18:01 | [Ground truth]
+1 RedVelvet Cheese Slc 38,000
+1 Chicken Baked Rice 55,000
+1 Fish n Chips 65,000
+1 Mushroom Soup 35,000
+1 Chamomile 25,000
+1 Iced Tea 20,000
+SUBTOTAL 238,000
+Service 17,850
+PB1 25,585
+TOTAL 281,435
+Coupon 100,000
+CASH 200,000
+Change 18,565
+2026-05-21 19:18:01 | response | status=ok  lang=en  WER=75.00%  CER=10.08%  elapsed=2.008s
+2026-05-21 19:18:03 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:18:06 | [Ground truth]
+1 Lemon Tea (L) 25.000
+1 Caramel Small 38.000
+TOTAL 63.000
+CASH 70.000
+CHANGED 7.000
+2026-05-21 19:18:06 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=2.623s
+2026-05-21 19:18:08 | POST /ocr | engine=easyocr  lang=de  fuzzy=True  fuzzer=symspell
+2026-05-21 19:18:08 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:18:11 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:18:13 | [OCR full text]
+XXI
+cafe
+Lemon Tea (L
+25.000
+Caramel Smal1
+38.000
+63.000
+TOTAL
+CASH
+70.000
+CHANGED
+7.000
+2026-05-21 19:18:13 | [Ground truth]
+1 Lemon Tea (L) 25.000
+1 Caramel Small 38.000
+TOTAL 63.000
+CASH 70.000
+CHANGED 7.000
+2026-05-21 19:18:13 | response | status=ok  lang=en  WER=90.91%  CER=34.52%  elapsed=2.166s
+2026-05-21 19:18:15 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:18:16 | [OCR full text]
+1 [LG] BLACK SAKURA
+1 LONGAN
+1 ROASTED ALMOND
+1 MANGGO
+1 VINERAL WATER counting) Sk
+Sub Total
+PB1 (10%)
+Rounding
+Total
+Cash Payment
+2026-05-21 19:18:16 | [Ground truth]
+1 [LG] BLACK SAKURA 59,091
+1 LONGAN 0
+1 ROASTED ALMOND 0
+1 IVANGGO 0
+1 IVINERAL WATER (bundling) 5k 4,545
+Sub Total 63,636
+PB1 (10%) 6,364
+Rounding 0
+Total 70,000
+Cash Payment 100,000
+Change 30,000
+2026-05-21 19:18:16 | response | status=ok  lang=en  WER=76.92%  CER=36.04%  elapsed=1.334s
+2026-05-21 19:18:18 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:18:21 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:18:23 | [OCR full text]
+1 [LG] BLACK SAKURA
+59,091
+1LONGAN
+0
+1ROASTEDALMOND
+0
+1VANGGO
+0
+1 VINERAL WATER (bundling) 5k
+4,545
+Sub Total
+63,636
+PB110%
+6,364
+Rounding
+0
+Total
+70,000
+Cash Payment
+100,000
+Change
+30,000
+***
+2026-05-21 19:18:23 | [Ground truth]
+1 [LG] BLACK SAKURA 59,091
+1 LONGAN 0
+1 ROASTED ALMOND 0
+1 IVANGGO 0
+1 IVINERAL WATER (bundling) 5k 4,545
+Sub Total 63,636
+PB1 (10%) 6,364
+Rounding 0
+Total 70,000
+Cash Payment 100,000
+Change 30,000
+2026-05-21 19:18:23 | response | status=ok  lang=en  WER=80.77%  CER=12.18%  elapsed=1.761s
+2026-05-21 19:18:25 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:18:27 | [OCR full text]
+Gablin's Mace
+Mozarella blot
+Dog
+Chill Pepper
+Croquette
+Cheese
+Croquette
+Plaatik Amook
+Plastik Putih
+Take Away
+Subtotal 91,000
+Discount (0)
+TOTAL Rp. 91,000
+Debit 91,000
+YOOOOXXXX XXX
+2026-05-21 19:18:27 | [Ground truth]
+Goblin's Mace 1 25,000
+Mozarella Hot 2 38,000
+Dog
+Chili Pepper 1 14,000
+Croquette
+Cheese 1 14,000
+Croquette
+Plastik Amook 1 0
+Plastik Putih 1 0
+Take Away
+Subtotal 91,000
+Discount (0)
+TOTAL Rp. 91,000
+Debit 91,000
+2026-05-21 19:18:27 | response | status=ok  lang=en  WER=83.33%  CER=29.72%  elapsed=2.247s
+2026-05-21 19:18:29 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:18:32 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:18:34 | [OCR full text]
+Goblin's Mace
+25,000
+Mozarella Hot
+2
+38,000
+bed
+Chill Pepper
+14,000
+Croquette
+14,000
+Chease
+Croquette
+Plastik Amook
+0
+Plastik Putih
+0
+Take Away
+91,000
+Subtotal
+Discount
+(0)
+TOTAL
+Rp.91,000
+Debit
+91,000
+XXXXXXXXXXXX
+2026-05-21 19:18:34 | [Ground truth]
+Goblin's Mace 1 25,000
+Mozarella Hot 2 38,000
+Dog
+Chili Pepper 1 14,000
+Croquette
+Cheese 1 14,000
+Croquette
+Plastik Amook 1 0
+Plastik Putih 1 0
+Take Away
+Subtotal 91,000
+Discount (0)
+TOTAL Rp. 91,000
+Debit 91,000
+2026-05-21 19:18:34 | response | status=ok  lang=en  WER=95.83%  CER=30.19%  elapsed=2.524s
+2026-05-21 19:21:29 | POST /ocr | engine=easyocr  lang=de  fuzzy=True  fuzzer=symspell
+2026-05-21 19:21:43 | [OCR full text]
+nate s [ 1 € s $ s 1 n s s ^ [ s a 55[1 gerolste'NeR MEDIUM s16 tiefen es Kohlonsaure aus Vulkaneifel den natürlicher
+s|ne du l w s 5 $e8
+MEDIUM tiefen der natüreicher Kohicnsaure aus Vulkaneifel den ein
+2026-05-21 19:21:43 | response | status=ok  lang=de  blocks=3  elapsed=13.427s
+2026-05-21 19:22:03 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:22:05 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:22:05 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=1.190s
+2026-05-21 19:22:07 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:22:07 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:22:07 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=0.289s
+2026-05-21 19:22:09 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:22:14 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:22:14 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=4.583s
+2026-05-21 19:22:16 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:22:16 | [OCR full text]
+901016 -TICKET CP
+60,000 £0,000
+TOTAL DISS $ -h0 000
+TAX 5 455
+Subtotal 0.000
+TOTAL caty 2.00 60,000
+- EDC CIMB NIAGA No: xx7730 60.000
+eherToNMcodD THEA
+2026-05-21 19:22:16 | [Ground truth]
+901016 -TICKET CP
+2 60.000 60.000
+TOTAL DISC $ -60.000
+TAX 5.455
+Subtotal 60.000
+TOTAL (Qty 2.00 60.000
+EDC CIMB NIAGA No: xx7730 60.000
+2026-05-21 19:22:16 | response | status=ok  lang=en  WER=77.78%  CER=24.26%  elapsed=0.893s
+2026-05-21 19:22:19 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:22:24 | [OCR full text]
+ 901016 ~TICKET i n 60,002 i,i00 TOTAL DIS: $ ~60,000 the 5,455 Subtota] 6i,000 ToTaL (@ty 2.00 60 . 000 do CIMD NIAGA to: xx7730 60 ,000 
+2026-05-21 19:22:24 | [Ground truth]
+901016 -TICKET CP
+2 60.000 60.000
+TOTAL DISC $ -60.000
+TAX 5.455
+Subtotal 60.000
+TOTAL (Qty 2.00 60.000
+EDC CIMB NIAGA No: xx7730 60.000
+2026-05-21 19:22:24 | response | status=ok  lang=en  WER=122.22%  CER=27.94%  elapsed=5.283s
+2026-05-21 19:22:26 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:22:31 | [OCR full text]
+-TICKET CP
+901016
+60.000
+C0.000
+2
+TOTAL DISC$
+-60.000
+TAX
+5.455
+Subtotal
+60.000
+TOTALQty 2.00 60.000
+60.000
+EDC CIMB NIAGA No:xx7730
+CUSTONERINEO
+2026-05-21 19:22:31 | [Ground truth]
+901016 -TICKET CP
+2 60.000 60.000
+TOTAL DISC $ -60.000
+TAX 5.455
+Subtotal 60.000
+TOTAL (Qty 2.00 60.000
+EDC CIMB NIAGA No: xx7730 60.000
+2026-05-21 19:22:31 | response | status=ok  lang=yo  WER=77.78%  CER=33.09%  elapsed=4.968s
+2026-05-21 19:22:33 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:22:34 | [OCR full text]
+oF
+Ca lie s
+~ tS ‘eke
+~““Ce@
+= =
+1) Q)
+3 a
+o-oo
+et i
+, > . ne (_)
+2026-05-21 19:22:34 | [Ground truth]
+J.STB PROMO 17500
+Y.B.BAT 46000
+Y.BASO PROM 27500
+TOTAL 91000
+CASH 91000
+2026-05-21 19:22:34 | response | status=ok  lang=en  WER=162.50%  CER=90.28%  elapsed=1.635s
+2026-05-21 19:22:37 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:22:41 | [OCR full text]
+i STE PFO 6.a i.vasu i i 0TAL CASh
+i
+poo
+30o
+5
+0 :
+4006
+5
+oh
+275
+CAS
+n
+i
+i
+9
+1
+0
+0
+0
+i
+9
+1
+0
+0
+0
+i
+i
+i
+2026-05-21 19:22:41 | [Ground truth]
+J.STB PROMO 17500
+Y.B.BAT 46000
+Y.BASO PROM 27500
+TOTAL 91000
+CASH 91000
+2026-05-21 19:22:41 | response | status=ok  lang=en  WER=125.00%  CER=109.72%  elapsed=4.304s
+2026-05-21 19:22:43 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:22:44 | [OCR full text]
+J.STB PRONO
+17500
+Y.B.BAT
+46000
+27500
+Y.BASO PROM
+91000
+TOTAL
+91000
+CASH
+2026-05-21 19:22:44 | [Ground truth]
+J.STB PROMO 17500
+Y.B.BAT 46000
+Y.BASO PROM 27500
+TOTAL 91000
+CASH 91000
+2026-05-21 19:22:44 | response | status=ok  lang=en  WER=87.50%  CER=27.78%  elapsed=1.568s
+2026-05-21 19:22:47 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:22:48 | [OCR full text]
+13 1S Ete 24,000
+Fak
+hy
+SUB [UTA
+IOTAL SAPES
+TOTAL TIONS
+CASH
+CHANGE
+NU] JELLY CL} 4,000
+at
+28,000
+4)
+26,000
+|
+100,00
+2026-05-21 19:22:48 | [Ground truth]
+1 JASMINE MT ( L ) 24,000
+COCONUT JELLY ( L ) 4,000
+SUB TOTAL 28,000
+TOTAL SAI S 28,000
+TOTAL ITEMS 1
+CASH 100,000
+CHANGE 72,000
+2026-05-21 19:22:48 | response | status=ok  lang=en  WER=95.24%  CER=79.69%  elapsed=1.765s
+2026-05-21 19:22:50 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:22:55 | [OCR full text]
+i*i i 24,000 xun] JELLY 4,000 SUB   (OTA 28,000 total i ,3 i28 , 006 TOTAL i CASH 100 , 00_ CHANGE 72,000 queue in; 402
+2026-05-21 19:22:55 | [Ground truth]
+1 JASMINE MT ( L ) 24,000
+COCONUT JELLY ( L ) 4,000
+SUB TOTAL 28,000
+TOTAL SAI S 28,000
+TOTAL ITEMS 1
+CASH 100,000
+CHANGE 72,000
+2026-05-21 19:22:55 | response | status=ok  lang=en  WER=119.05%  CER=60.16%  elapsed=4.500s
+2026-05-21 19:22:57 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:22:58 | [OCR full text]
+SMINE MTL
+1
+24.000
+CONUT JELLYL
+4.000
+SUB TOTA
+28,000
+TOTAL SALES
+28.000
+TOTAL ILS
+1
+100.000
+CASH
+72.000
+CHANGE
+weue No:
+2026-05-21 19:22:58 | [Ground truth]
+1 JASMINE MT ( L ) 24,000
+COCONUT JELLY ( L ) 4,000
+SUB TOTAL 28,000
+TOTAL SAI S 28,000
+TOTAL ITEMS 1
+CASH 100,000
+CHANGE 72,000
+2026-05-21 19:22:58 | response | status=ok  lang=en  WER=100.00%  CER=39.84%  elapsed=1.299s
+2026-05-21 19:23:00 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:23:02 | [OCR full text]
+Dyer
+@11000
+1X
+DONAT GULA 11,000
+1 OOxITEMS
+SUBTOTAL 11,000
+TOTAL 11,000
+11,000
+2026-05-21 19:23:02 | [Ground truth]
+1X @11000
+DONAT GULA 11,000
+1.00xITEMs
+SUBTOTAL 11,000
+TOTAL 11,000
+CASH 11,000
+2026-05-21 19:23:02 | response | status=ok  lang=en  WER=85.71%  CER=21.52%  elapsed=1.800s
+2026-05-21 19:23:04 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:23:10 | [OCR full text]
+0080 i @11000 DONAT GULA 11,000 1.OOxITEMs SUBTOTAL 11,000 hotel 11,000 can 11,000 i:
+2026-05-21 19:23:10 | [Ground truth]
+1X @11000
+DONAT GULA 11,000
+1.00xITEMs
+SUBTOTAL 11,000
+TOTAL 11,000
+CASH 11,000
+2026-05-21 19:23:10 | response | status=ok  lang=en  WER=171.43%  CER=31.65%  elapsed=5.495s
+2026-05-21 19:23:12 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:23:13 | [OCR full text]
+D
+Bohoryct
+Hm
+@11000
+1X
+11,000
+DONAT GULA
+1.00xITEMs
+11,000
+SUBTOTAL
+11,000
+TOTAL
+11,000
+CASH
+2026-05-21 19:23:13 | [Ground truth]
+1X @11000
+DONAT GULA 11,000
+1.00xITEMs
+SUBTOTAL 11,000
+TOTAL 11,000
+CASH 11,000
+2026-05-21 19:23:13 | response | status=ok  lang=en  WER=100.00%  CER=59.49%  elapsed=1.370s
+2026-05-21 19:23:15 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:23:17 | [Ground truth]
+ICE BLACKCOFFE 2 82,000
+AVOCADO COFFEE 1 61,000
+CHIKEN KATSU FF 1 51,000
+SUB_TOTAL 194,000
+DISCOUNT 19,400
+TOTAL 174,600
+CASH 200,000
+CHANGE 25,400
+2026-05-21 19:23:17 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=2.254s
+2026-05-21 19:23:19 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:23:29 | [OCR full text]
+4 data base l  do iq& i.oe (i BLACKCOFFE 12 oj avocado COFFEE 61 liz CUIKEN natsu of 54 oj SUE_TOTAL 15 < , MUC DISJCUNT 19 4i l0i 0i 4 174 i10 i $i i00,i3i ChANGE 25,400 doc ok now COO
+2026-05-21 19:23:29 | [Ground truth]
+ICE BLACKCOFFE 2 82,000
+AVOCADO COFFEE 1 61,000
+CHIKEN KATSU FF 1 51,000
+SUB_TOTAL 194,000
+DISCOUNT 19,400
+TOTAL 174,600
+CASH 200,000
+CHANGE 25,400
+2026-05-21 19:23:29 | response | status=ok  lang=en  WER=243.75%  CER=80.27%  elapsed=9.397s
+2026-05-21 19:23:31 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:23:33 | [OCR full text]
+Umo
+aloy
+ICE BLACKCOFFE
+32,000
+AVOCADO COFFEE
+61,000
+CHIKEN KATSUNFF
+51000
+Bby
+49
+SUS TSTAL
+194,000
+19,400
+eR
+TOTAL
+174,600
+CASH
+200,000
+CHANGE
+25,400
+2026-05-21 19:23:33 | [Ground truth]
+ICE BLACKCOFFE 2 82,000
+AVOCADO COFFEE 1 61,000
+CHIKEN KATSU FF 1 51,000
+SUB_TOTAL 194,000
+DISCOUNT 19,400
+TOTAL 174,600
+CASH 200,000
+CHANGE 25,400
+2026-05-21 19:23:33 | response | status=ok  lang=en  WER=100.00%  CER=31.97%  elapsed=1.868s
+2026-05-21 19:23:35 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:23:36 | [OCR full text]
+TRAD KY TOAST CARTE 28. 182
+ITEMS 1.00
+SUBTTL 28. 182
+PB-1 10% 2.818
+TOTAL 31.000
+CASH 31.000
+2026-05-21 19:23:36 | [Ground truth]
+TRAD KY TOAST CARTE 28.182
+ITEMS 1.00
+SUBTTL 28.182
+PB-1 10% 2.818
+TOTAL 31.000
+CASH 31.000
+2026-05-21 19:23:36 | response | status=ok  lang=en  WER=36.36%  CER=2.20%  elapsed=1.749s
+2026-05-21 19:23:39 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:23:41 | [OCR full text]
+TRAD i TOAST   CARTE 28 . 182 ITEMS 1.00 SUBTTL 28 . 182 i-1 103 2.818 TOTAL 31 0oo CASH 31 0oo
+2026-05-21 19:23:41 | [Ground truth]
+TRAD KY TOAST CARTE 28.182
+ITEMS 1.00
+SUBTTL 28.182
+PB-1 10% 2.818
+TOTAL 31.000
+CASH 31.000
+2026-05-21 19:23:41 | response | status=ok  lang=en  WER=172.73%  CER=24.18%  elapsed=2.867s
+2026-05-21 19:23:43 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:23:45 | [OCR full text]
+TRAD KY TOAST CARTE
+28.182
+ITEMS 1.00
+SUBTTL
+28.182
+PB-1 10%
+2.818
+TOTAL
+31.000
+CASH
+31.000
+2026-05-21 19:23:45 | [Ground truth]
+TRAD KY TOAST CARTE 28.182
+ITEMS 1.00
+SUBTTL 28.182
+PB-1 10% 2.818
+TOTAL 31.000
+CASH 31.000
+2026-05-21 19:23:45 | response | status=ok  lang=en  WER=72.73%  CER=5.49%  elapsed=1.687s
+2026-05-21 19:23:47 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:23:48 | [OCR full text]
+1 2GG TART 13,990
+2 sHOCO CUSARD PASTRY __ 24
+1 2EDBEAN BIEAD 9,000 a
+TOTAL 46 ,000
+CHANGE 4,000
+——— een ee
+7 _ cm
+tii
+2026-05-21 19:23:48 | [Ground truth]
+1 EGG TART 13,000
+2 CHOCO CUS ARD PASTRY 24,000
+1 REDBEAN BREAD 9,000
+TOTAL 46,000
+CASH 50,000
+CHANGE 4,000
+2026-05-21 19:23:48 | response | status=ok  lang=en  WER=120.00%  CER=39.25%  elapsed=0.924s
+2026-05-21 19:23:50 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:23:52 | [OCR full text]
+an EGG TART 13,000 2 MHOCQ CUS" ARD PASTRY 24,8of REDBEAN BIPEAD 9,000 total 46,000 MASH 50,000 CHANCE 4,000
+2026-05-21 19:23:52 | [Ground truth]
+1 EGG TART 13,000
+2 CHOCO CUS ARD PASTRY 24,000
+1 REDBEAN BREAD 9,000
+TOTAL 46,000
+CASH 50,000
+CHANGE 4,000
+2026-05-21 19:23:52 | response | status=ok  lang=en  WER=86.67%  CER=21.50%  elapsed=1.519s
+2026-05-21 19:23:54 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:23:55 | [OCR full text]
+1GG TART
+13,000
+2CHOCO CUS ARD PASTRY
+24,000
+1 REDBEAN BIEAD
+9,000
+TOTAL
+46,000
+CASH
+50,000
+4,000
+CHANGE
+2026-05-21 19:23:55 | [Ground truth]
+1 EGG TART 13,000
+2 CHOCO CUS ARD PASTRY 24,000
+1 REDBEAN BREAD 9,000
+TOTAL 46,000
+CASH 50,000
+CHANGE 4,000
+2026-05-21 19:23:55 | response | status=ok  lang=en  WER=80.00%  CER=19.63%  elapsed=1.161s
+2026-05-21 19:23:57 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:24:00 | [Ground truth]
+Kupon 15 100,000
+ADD CHICKEN BOX 909
+Subtotal 100,909
+PB1 (10%) 10,091
+Total 111,000
+Cash Rp. 111,000
+2026-05-21 19:24:00 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=2.652s
+2026-05-21 19:24:02 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:24:07 | [OCR full text]
+15 guo and CXICKEN box to? Subtotal 100,709 PDI (104) 10,071 total 114,000 cash 111,009 upon 00, i :
+2026-05-21 19:24:07 | [Ground truth]
+Kupon 15 100,000
+ADD CHICKEN BOX 909
+Subtotal 100,909
+PB1 (10%) 10,091
+Total 111,000
+Cash Rp. 111,000
+2026-05-21 19:24:07 | response | status=ok  lang=en  WER=158.33%  CER=52.48%  elapsed=5.787s
+2026-05-21 19:24:09 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:24:11 | [OCR full text]
+Kupon 15
+100,000
+909
+Subtotal
+100,909
+PB1(10%)
+10,091
+Total
+111,000
+Cash
+p.111,000
+2026-05-21 19:24:11 | [Ground truth]
+Kupon 15 100,000
+ADD CHICKEN BOX 909
+Subtotal 100,909
+PB1 (10%) 10,091
+Total 111,000
+Cash Rp. 111,000
+2026-05-21 19:24:11 | response | status=ok  lang=so  WER=91.67%  CER=23.76%  elapsed=1.500s
+2026-05-21 19:24:13 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:24:14 | [Ground truth]
+1 [REG] BLACK SAKURA 45,455
+1 COOKIE DOH SAUCES 0
+1 NATA DE COCO 0
+Sub Total 45,455
+PB1 (10%) 4,545
+Rounding 0
+Total 50,000
+Card Payment 50,000
+2026-05-21 19:24:14 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=0.684s
+2026-05-21 19:24:16 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:24:17 | [OCR full text]
+i1 [REG] BLACK SAKURA 45,455 COOKIE DOH SAUCES 0 NATA i COCO rub total 45,455 i1 (16%) 4,545 pounding total 50,000 hard payment 50,000 oak
+2026-05-21 19:24:17 | [Ground truth]
+1 [REG] BLACK SAKURA 45,455
+1 COOKIE DOH SAUCES 0
+1 NATA DE COCO 0
+Sub Total 45,455
+PB1 (10%) 4,545
+Rounding 0
+Total 50,000
+Card Payment 50,000
+2026-05-21 19:24:17 | response | status=ok  lang=en  WER=76.19%  CER=18.88%  elapsed=1.543s
+2026-05-21 19:24:19 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:24:21 | [OCR full text]
+1[REG] BLACK SAKURA
+45,455
+1COOKIE DOH SAUCES
+0
+0
+1 NATA DE COCO
+Sub Total
+45,455
+PB11G%
+4,545
+Rounding
+0
+50,000
+Total
+50,000
+Card Payment
+2026-05-21 19:24:21 | [Ground truth]
+1 [REG] BLACK SAKURA 45,455
+1 COOKIE DOH SAUCES 0
+1 NATA DE COCO 0
+Sub Total 45,455
+PB1 (10%) 4,545
+Rounding 0
+Total 50,000
+Card Payment 50,000
+2026-05-21 19:24:21 | response | status=ok  lang=en  WER=76.19%  CER=20.98%  elapsed=1.466s
+2026-05-21 19:24:23 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:24:25 | [OCR full text]
+on eeremeeenee cannennnnnpens
+eee | ne hen ene es ne ene ot: Pal
+Anes teteenscasmnonmnmr hs het tri ermrcnaemnaen sainnenerneneet se GATS
+hadienpehedihndsetiandedgnassteeaeheeeneaneeneneiateet eee rom
+pacioanretes saonernanet
+posseooanethanaseshapsnousinabertspnivenentsoor’ mass taapenrcnpeann teeta aeRO e SENE, 2 ONT
+Seem seamen ete gn noemmnannnnane’
+Bumbu Kaldu Ayam 1
+36000 36000,
+“ ;
+: Sub Total 38000
+Discount (0 %)
+setemcmsteeteeereteet tn en ee to ia
+Kembalian 14000
+2026-05-21 19:24:25 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:24:25 | response | status=ok  lang=en  WER=600.00%  CER=456.82%  elapsed=1.824s
+2026-05-21 19:24:27 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:24:29 | [OCR full text]
+Bumnbu bald yam 1 38000 38000 rub local 36000 discount (0 %) tuna SQOOO Kombalian 14000
+2026-05-21 19:24:29 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:24:29 | response | status=ok  lang=en  WER=175.00%  CER=29.55%  elapsed=2.343s
+2026-05-21 19:24:31 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:24:32 | [OCR full text]
+Bumbu Kaldu Ayam 1
+36000
+36000
+Sub Total
+36000
+Discount 0%
+Trunl
+50000
+Kombalian
+14000
+2026-05-21 19:24:32 | [Ground truth]
+Bumbu Kaldu Ayam 1 36000
+36000
+Sub Total
+36000
+Discount (0%)
+Tunai
+50000
+Kembalian 14000
+2026-05-21 19:24:32 | response | status=ok  lang=tl  WER=50.00%  CER=9.09%  elapsed=1.017s
+2026-05-21 19:24:34 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:24:35 | [OCR full text]
+CINNAMON SUGAR
+1 x 17,000 17,000
+SUBTOTAL.) j/iiea. i- daeea ene
+GRAND TOTAL 17,000
+CASHIDR 20,000
+CHANGE DUE 3,000
+2026-05-21 19:24:35 | [Ground truth]
+CINNAMON SUGAR
+1 x 17,000 17,000
+SUB TOTAL 17,000
+GRAND TOTAL 17,000
+CASH IDR 20,000
+CHANGE DUE 3,000
+2026-05-21 19:24:35 | response | status=ok  lang=en  WER=53.85%  CER=23.76%  elapsed=0.978s
+2026-05-21 19:24:37 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:24:40 | [OCR full text]
+i
+CINNAMON SUGAR
+17,000
+17,000
+SUB TOTAL 17,000
+GRAND TOTAL
+17,000
+CASH IDR
+20 0oo
+CHANGE DUE
+3,000
+2026-05-21 19:24:40 | [Ground truth]
+CINNAMON SUGAR
+1 x 17,000 17,000
+SUB TOTAL 17,000
+GRAND TOTAL 17,000
+CASH IDR 20,000
+CHANGE DUE 3,000
+2026-05-21 19:24:40 | response | status=ok  lang=en  WER=84.62%  CER=12.87%  elapsed=2.778s
+2026-05-21 19:24:42 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:24:43 | [OCR full text]
+AantieAnne's
+CINNAMONSUGAR
+1
+x17,000
+17,000
+SUB TOTAL
+17,000
+GRANDTOTAL
+17,000
+CASHIDR
+20,000
+CHANGEDUE
+3,000
+2026-05-21 19:24:43 | [Ground truth]
+CINNAMON SUGAR
+1 x 17,000 17,000
+SUB TOTAL 17,000
+GRAND TOTAL 17,000
+CASH IDR 20,000
+CHANGE DUE 3,000
+2026-05-21 19:24:43 | response | status=ok  lang=af  WER=100.00%  CER=23.76%  elapsed=1.126s
+2026-05-21 19:24:45 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:24:49 | [Ground truth]
+1 BANABERRY FRESH CREAM CAK 230,000
+TOTAL CASH 230,000 230,000
+CHANGE 0
+2026-05-21 19:24:49 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=3.424s
+2026-05-21 19:24:51 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:24:56 | [OCR full text]
+1 can-bert  FRESH CREAN CAK 230,000 TOTAL 230,000 CASH 0 CHANGE
+2026-05-21 19:24:56 | [Ground truth]
+1 BANABERRY FRESH CREAM CAK 230,000
+TOTAL CASH 230,000 230,000
+CHANGE 0
+2026-05-21 19:24:56 | response | status=ok  lang=en  WER=60.00%  CER=35.21%  elapsed=5.442s
+2026-05-21 19:24:58 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:25:00 | [OCR full text]
+1 BANABERRY FRESH CREAM CAK230,000
+230,000
+TOTAL
+230,000
+CASH
+0
+CHANGE
+2026-05-21 19:25:00 | [Ground truth]
+1 BANABERRY FRESH CREAM CAK 230,000
+TOTAL CASH 230,000 230,000
+CHANGE 0
+2026-05-21 19:25:00 | response | status=ok  lang=en  WER=60.00%  CER=32.39%  elapsed=1.830s
+2026-05-21 19:25:02 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:25:04 | [Ground truth]
+0571-1854 BLUS WANITA
+1 @120,000 0% 120,000
+1002-0060 SHOPPING BAG
+1 @880 100% 0
+TOTAL (2 item) 120,000
+CC.Visa.BCA 120,000
+Total Kembalian 0
+2026-05-21 19:25:04 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=2.153s
+2026-05-21 19:25:06 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:25:18 | [OCR full text]
+27
+23
+0571-1854 BLUS VANITA i0u 0i 1002-i6i ING RAG 0 2880  1002 TOTAL (2 ice) 120 , you i RCA 120,i0: total Keabalian 0 120,i0i 8120 . SHOPP lisa.
+0571-1854 BLUS VaNITA i0u 0 1002-ooo SHOPFING i 8170 .
+0574-1854 1002-i6i TOTAL (2 ic i RCA total verbal lisa.
+120,i to
+0
+KAG
+2880
+100"
+TOTAL
+120=  you
+ice
+1   0,i00
+Keahilian
+0
+2026-05-21 19:25:18 | [Ground truth]
+0571-1854 BLUS WANITA
+1 @120,000 0% 120,000
+1002-0060 SHOPPING BAG
+1 @880 100% 0
+TOTAL (2 item) 120,000
+CC.Visa.BCA 120,000
+Total Kembalian 0
+2026-05-21 19:25:18 | response | status=ok  lang=en  WER=270.59%  CER=165.96%  elapsed=12.176s
+2026-05-21 19:25:20 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:25:22 | [OCR full text]
+29
+0571-1854BLUS WANITA
+0120,0000%
+120,000
+1002-0060 SHOPPING BAG
+1
+0
+@860100%
+TOTAL 2 item)
+120,000
+CC.Visa.BCA
+120,000
+Total Keabalian
+0
+2026-05-21 19:25:22 | [Ground truth]
+0571-1854 BLUS WANITA
+1 @120,000 0% 120,000
+1002-0060 SHOPPING BAG
+1 @880 100% 0
+TOTAL (2 item) 120,000
+CC.Visa.BCA 120,000
+Total Kembalian 0
+2026-05-21 19:25:22 | response | status=ok  lang=id  WER=94.12%  CER=14.89%  elapsed=1.706s
+2026-05-21 19:25:24 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:25:26 | [OCR full text]
+a ee
+Ih oeres ee ee pereyabornd enol
+Tat netern es enbernraer tien:
+2026-05-21 19:25:26 | [Ground truth]
+BASO KUAH 1 43.636 43.636
+A.MINERAL GELAS 1 3,000 3,000
+TOTAL 46.636
+DPP 46.636
+TAX 10.00 % 4.664
+GRAND TOTAL 51.300
+TUNAI 52.000
+KEMBALI 700
+2026-05-21 19:25:26 | response | status=ok  lang=en  WER=100.00%  CER=90.78%  elapsed=2.053s
+2026-05-21 19:25:28 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:25:38 | [OCR full text]
+0 2
+2
+> 0 JQURNIY 3 7 BABD KUAH 43-636 i-MINERAL CEAS 3-0i 3,i0 3 TDTAL 46 DFP TAX i0.0) % 3 BRAND TOTA 517 i TLNNAI i KBBAI 2 464 524
+3
+43-6 340 3 46
+BASD KLNH
+i-MINERAL CBA
+TDTA
+46. 3 5]
+i0.0)
+i
+TOTA
+TLNNAI
+2026-05-21 19:25:38 | [Ground truth]
+BASO KUAH 1 43.636 43.636
+A.MINERAL GELAS 1 3,000 3,000
+TOTAL 46.636
+DPP 46.636
+TAX 10.00 % 4.664
+GRAND TOTAL 51.300
+TUNAI 52.000
+KEMBALI 700
+2026-05-21 19:25:38 | response | status=ok  lang=en  WER=200.00%  CER=108.51%  elapsed=9.402s
+2026-05-21 19:25:40 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:25:42 | [OCR full text]
+ODJOURNEY
+HASDKLWH
+143.636
+43.63
+A.MINERALCOLAS
+13.000
+3.000
+TOTAL
+46.60
+DFP
+46.66
+TAX10.00
+4.6
+51.300
+FUNGE
+TUAAAI
+52.000
+KEMBALT
+700
+2026-05-21 19:25:42 | [Ground truth]
+BASO KUAH 1 43.636 43.636
+A.MINERAL GELAS 1 3,000 3,000
+TOTAL 46.636
+DPP 46.636
+TAX 10.00 % 4.664
+GRAND TOTAL 51.300
+TUNAI 52.000
+KEMBALI 700
+2026-05-21 19:25:42 | response | status=ok  lang=en  WER=100.00%  CER=43.97%  elapsed=1.881s
+2026-05-21 19:25:44 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:25:45 | [OCR full text]
+1 RedVelvet Cheese Sic
+1 Chicken Baked Rice
+i Fish fp Chips
+i Ausmroum Soup
+i Chamomile
+i Iced Tea
+SUBTOTAL
+Service
+PBI ‘
+De a ee mee ee nm et ae ae ee he na a i at
+ee
+CAS
+Change
+238, 000
+17,850
+25 505
+ev St ne ae fn nna as ne a mt wa
+281,435
+100,000
+200,000
+18,565
+a a
+RDS BABS ee ee ne ee et ee ee
+eo nett Oe ete be ons ee oy ae oo
+2026-05-21 19:25:45 | [Ground truth]
+1 RedVelvet Cheese Slc 38,000
+1 Chicken Baked Rice 55,000
+1 Fish n Chips 65,000
+1 Mushroom Soup 35,000
+1 Chamomile 25,000
+1 Iced Tea 20,000
+SUBTOTAL 238,000
+Service 17,850
+PB1 25,585
+TOTAL 281,435
+Coupon 100,000
+CASH 200,000
+Change 18,565
+2026-05-21 19:25:45 | response | status=ok  lang=en  WER=200.00%  CER=99.16%  elapsed=1.659s
+2026-05-21 19:25:47 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:26:00 | [OCR full text]
+1 RedVelvel sheesh SJC 38 too 1 chicken naked file too 1 wish ti ships 65,@oo 1 Nusnroum 35 doo chamomile 25,000 1 iced sea i0, to SWbToTAL 238 , i0i service 17,850 fbi 25,585 TOTAL 281,435 coupon 100, to CASH 200 4 do change 18 i 565 soup
+30, 9 to0 55,o00 65 @oo 35 too 25 @oo 20 , OCO
+SWbtoTAL service
+fbi
+TOTAL
+100 7 to 200 too 18,565
+coupon CASH change
+2026-05-21 19:26:00 | [Ground truth]
+1 RedVelvet Cheese Slc 38,000
+1 Chicken Baked Rice 55,000
+1 Fish n Chips 65,000
+1 Mushroom Soup 35,000
+1 Chamomile 25,000
+1 Iced Tea 20,000
+SUBTOTAL 238,000
+Service 17,850
+PB1 25,585
+TOTAL 281,435
+Coupon 100,000
+CASH 200,000
+Change 18,565
+2026-05-21 19:26:00 | response | status=ok  lang=en  WER=242.86%  CER=84.87%  elapsed=12.521s
+2026-05-21 19:26:02 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:26:04 | [OCR full text]
+1 RedVelvet Cheese Slc
+38000
+Chicken Baked Rice
+55,000
+1 Fish n Chis
+65000
+Mushroom Soup
+35,000
+1 Chamomile
+25,000
+1 Iced Tea
+20000
+SUBTOTAL
+238000
+Service
+17850
+PB1
+25,585
+TOTAL
+281.435
+Coupon
+100,000
+CASH
+200,000
+Change
+18,565
+2026-05-21 19:26:04 | [Ground truth]
+1 RedVelvet Cheese Slc 38,000
+1 Chicken Baked Rice 55,000
+1 Fish n Chips 65,000
+1 Mushroom Soup 35,000
+1 Chamomile 25,000
+1 Iced Tea 20,000
+SUBTOTAL 238,000
+Service 17,850
+PB1 25,585
+TOTAL 281,435
+Coupon 100,000
+CASH 200,000
+Change 18,565
+2026-05-21 19:26:04 | response | status=ok  lang=en  WER=75.00%  CER=10.08%  elapsed=1.922s
+2026-05-21 19:26:06 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:26:08 | [Ground truth]
+1 Lemon Tea (L) 25.000
+1 Caramel Small 38.000
+TOTAL 63.000
+CASH 70.000
+CHANGED 7.000
+2026-05-21 19:26:08 | response | status=no_text_detected  lang=None  WER=100.00%  CER=100.00%  elapsed=2.473s
+2026-05-21 19:26:10 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:26:16 | [OCR full text]
+i 5 demon sea (i) 25,000 madame] ma | | 38 . 000 TOTAL 63,i00 CASH 70. 000 CHANGED 7.000
+2026-05-21 19:26:16 | [Ground truth]
+1 Lemon Tea (L) 25.000
+1 Caramel Small 38.000
+TOTAL 63.000
+CASH 70.000
+CHANGED 7.000
+2026-05-21 19:26:16 | response | status=ok  lang=en  WER=172.73%  CER=29.76%  elapsed=5.347s
+2026-05-21 19:26:18 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:26:20 | [OCR full text]
+XXI
+cafe
+Lemon Tea (L
+25.000
+Caramel Smal1
+38.000
+63.000
+TOTAL
+CASH
+70.000
+CHANGED
+7.000
+2026-05-21 19:26:20 | [Ground truth]
+1 Lemon Tea (L) 25.000
+1 Caramel Small 38.000
+TOTAL 63.000
+CASH 70.000
+CHANGED 7.000
+2026-05-21 19:26:20 | response | status=ok  lang=en  WER=90.91%  CER=34.52%  elapsed=1.878s
+2026-05-21 19:26:22 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:26:23 | [OCR full text]
+1 [LG] BLACK SAKURA
+1 LONGAN
+1 ROASTED ALMOND
+1 MANGGO
+1 VINERAL WATER counting) Sk
+Sub Total
+PB1 (10%)
+Rounding
+Total
+Cash Payment
+2026-05-21 19:26:23 | [Ground truth]
+1 [LG] BLACK SAKURA 59,091
+1 LONGAN 0
+1 ROASTED ALMOND 0
+1 IVANGGO 0
+1 IVINERAL WATER (bundling) 5k 4,545
+Sub Total 63,636
+PB1 (10%) 6,364
+Rounding 0
+Total 70,000
+Cash Payment 100,000
+Change 30,000
+2026-05-21 19:26:23 | response | status=ok  lang=en  WER=76.92%  CER=36.04%  elapsed=1.244s
+2026-05-21 19:26:25 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:26:28 | [OCR full text]
+7 [i] BLACK SAKURA 59,091 1 LONGAN 1 ROASTED ALMOND 8 1 MANGGO 1 NINERAL WATER (bungling) ok 4,545 rub total 63,636 i1 (10%) 6,364 pounding total 70,000 cash payment 100,000 change 30,000 k# 444
+2026-05-21 19:26:28 | [Ground truth]
+1 [LG] BLACK SAKURA 59,091
+1 LONGAN 0
+1 ROASTED ALMOND 0
+1 IVANGGO 0
+1 IVINERAL WATER (bundling) 5k 4,545
+Sub Total 63,636
+PB1 (10%) 6,364
+Rounding 0
+Total 70,000
+Cash Payment 100,000
+Change 30,000
+2026-05-21 19:26:28 | response | status=ok  lang=en  WER=103.85%  CER=19.80%  elapsed=2.451s
+2026-05-21 19:26:30 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:26:31 | [OCR full text]
+1 [LG] BLACK SAKURA
+59,091
+1LONGAN
+0
+1ROASTEDALMOND
+0
+1VANGGO
+0
+1 VINERAL WATER (bundling) 5k
+4,545
+Sub Total
+63,636
+PB110%
+6,364
+Rounding
+0
+Total
+70,000
+Cash Payment
+100,000
+Change
+30,000
+***
+2026-05-21 19:26:31 | [Ground truth]
+1 [LG] BLACK SAKURA 59,091
+1 LONGAN 0
+1 ROASTED ALMOND 0
+1 IVANGGO 0
+1 IVINERAL WATER (bundling) 5k 4,545
+Sub Total 63,636
+PB1 (10%) 6,364
+Rounding 0
+Total 70,000
+Cash Payment 100,000
+Change 30,000
+2026-05-21 19:26:31 | response | status=ok  lang=en  WER=80.77%  CER=12.18%  elapsed=1.586s
+2026-05-21 19:26:33 | POST /evaluate | engine=tesseract  lang=en  fuzzy=False
+2026-05-21 19:26:36 | [OCR full text]
+Gablin's Mace
+Mozarella blot
+Dog
+Chill Pepper
+Croquette
+Cheese
+Croquette
+Plaatik Amook
+Plastik Putih
+Take Away
+Subtotal 91,000
+Discount (0)
+TOTAL Rp. 91,000
+Debit 91,000
+YOOOOXXXX XXX
+2026-05-21 19:26:36 | [Ground truth]
+Goblin's Mace 1 25,000
+Mozarella Hot 2 38,000
+Dog
+Chili Pepper 1 14,000
+Croquette
+Cheese 1 14,000
+Croquette
+Plastik Amook 1 0
+Plastik Putih 1 0
+Take Away
+Subtotal 91,000
+Discount (0)
+TOTAL Rp. 91,000
+Debit 91,000
+2026-05-21 19:26:36 | response | status=ok  lang=en  WER=83.33%  CER=29.72%  elapsed=2.300s
+2026-05-21 19:26:38 | POST /evaluate | engine=easyocr  lang=en  fuzzy=True
+2026-05-21 19:26:47 | [OCR full text]
+44 molina idea 25,000 MozAralla |ot 38,000 nhl pepper 14,000 Croqualte hadn 14,000 Croquatte Plnatlk mook Plaatlk ruth mako way Subtotal 91,000 Dlacoun (0) TOTAL 91,000 noble 91,000 XXXXXXXXXXXX dog up:
+2026-05-21 19:26:47 | [Ground truth]
+Goblin's Mace 1 25,000
+Mozarella Hot 2 38,000
+Dog
+Chili Pepper 1 14,000
+Croquette
+Cheese 1 14,000
+Croquette
+Plastik Amook 1 0
+Plastik Putih 1 0
+Take Away
+Subtotal 91,000
+Discount (0)
+TOTAL Rp. 91,000
+Debit 91,000
+2026-05-21 19:26:47 | response | status=ok  lang=en  WER=125.00%  CER=46.23%  elapsed=9.372s
+2026-05-21 19:26:49 | POST /evaluate | engine=paddleocr  lang=auto  fuzzy=False
+2026-05-21 19:26:51 | [OCR full text]
+Goblin's Mace
+25,000
+Mozarella Hot
+2
+38,000
+bed
+Chill Pepper
+14,000
+Croquette
+14,000
+Chease
+Croquette
+Plastik Amook
+0
+Plastik Putih
+0
+Take Away
+91,000
+Subtotal
+Discount
+(0)
+TOTAL
+Rp.91,000
+Debit
+91,000
+XXXXXXXXXXXX
+2026-05-21 19:26:51 | [Ground truth]
+Goblin's Mace 1 25,000
+Mozarella Hot 2 38,000
+Dog
+Chili Pepper 1 14,000
+Croquette
+Cheese 1 14,000
+Croquette
+Plastik Amook 1 0
+Plastik Putih 1 0
+Take Away
+Subtotal 91,000
+Discount (0)
+TOTAL Rp. 91,000
+Debit 91,000
+2026-05-21 19:26:51 | response | status=ok  lang=en  WER=95.83%  CER=30.19%  elapsed=2.372s

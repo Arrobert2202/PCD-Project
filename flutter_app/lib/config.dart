@@ -1,6 +1,6 @@
 // change host to your laptop's IP before running
 class BackendConfig {
-  static String host = '127.0.0.1';
+  static String host = '192.168.0.200';
   static int port = 8000;
 
   static String get ocrEndpoint => 'http://$host:$port/ocr';

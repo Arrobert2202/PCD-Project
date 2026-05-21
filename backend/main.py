@@ -1,4 +1,8 @@
 import base64
+import logging
+import time
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
 from typing import Optional, Tuple
 from fastapi import FastAPI, HTTPException
 from jiwer import process_words, process_characters
@@ -13,6 +17,22 @@ from schemas import (
     EvaluateRequest, EvaluateResponse, ErrorCounts,
     BatchEvaluateRequest, BatchEvaluateResponse, AggregateMetrics,
 )
+
+_log_dir = Path(__file__).parent / "logs"
+_log_dir.mkdir(exist_ok=True)
+_fmt = logging.Formatter("%(asctime)s | %(message)s", datefmt="%Y-%m-%d %H:%M:%S")
+
+_file_handler = RotatingFileHandler(
+    _log_dir / "backend.log", maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8"
+)
+_file_handler.setFormatter(_fmt)
+_console_handler = logging.StreamHandler()
+_console_handler.setFormatter(_fmt)
+
+log = logging.getLogger("ocr_backend")
+log.setLevel(logging.INFO)
+log.addHandler(_file_handler)
+log.addHandler(_console_handler)
 
 app = FastAPI()
 
@@ -92,8 +112,12 @@ def health_check():
 
 @app.post("/ocr", response_model=OCRResponse)
 def ocr_single(request: OCRRequest):
+    log.info(f"POST /ocr | engine={request.engine}  lang={request.lang}  fuzzy={request.fuzzy}  fuzzer={request.fuzzer}")
+    t0 = time.perf_counter()
     image_bytes = _decode_image(request.image)
-    return _process_image(image_bytes, request.engine, request.lang, request.fuzzy, request.fuzzer)
+    result = _process_image(image_bytes, request.engine, request.lang, request.fuzzy, request.fuzzer)
+    log.info(f"response | status={result.status}  lang={result.language}  blocks={len(result.blocks)}  elapsed={time.perf_counter()-t0:.3f}s")
+    return result
 
 
 @app.post("/ocr/batch")
@@ -118,9 +142,16 @@ def ocr_batch(request: BatchOCRRequest):
 
 @app.post("/evaluate", response_model=EvaluateResponse)
 def evaluate_single(request: EvaluateRequest):
+    log.info(f"POST /evaluate | engine={request.engine}  lang={request.lang}  fuzzy={request.fuzzy}")
+    t0 = time.perf_counter()
     image_bytes = _decode_image(request.image)
     ocr = _process_image(image_bytes, request.engine, request.lang, request.fuzzy, request.fuzzer)
+    if request.expected_text:
+        log.info(f"[Ground truth]\n{request.expected_text}")
     wer, cer, word_errors, char_errors = _compute_metrics(request.expected_text, ocr.full_text)
+    wer_str = f"{wer*100:.2f}%" if wer is not None else "n/a"
+    cer_str = f"{cer*100:.2f}%" if cer is not None else "n/a"
+    log.info(f"response | status={ocr.status}  lang={ocr.language}  WER={wer_str}  CER={cer_str}  elapsed={time.perf_counter()-t0:.3f}s")
     return EvaluateResponse(
         status=ocr.status,
         engine=ocr.engine,
@@ -137,12 +168,19 @@ def evaluate_single(request: EvaluateRequest):
 
 @app.post("/evaluate/batch", response_model=BatchEvaluateResponse)
 def evaluate_batch(request: BatchEvaluateRequest):
+    log.info(f"POST /evaluate/batch | engine={request.engine}  lang={request.lang}  fuzzy={request.fuzzy}  items={len(request.items)}")
+    t0 = time.perf_counter()
     results = []
-    for item in request.items:
+    for idx, item in enumerate(request.items):
         try:
             image_bytes = _decode_image(item.image)
             ocr = _process_image(image_bytes, request.engine, request.lang, request.fuzzy, request.fuzzer)
+            if item.expected_text:
+                log.info(f"[item {idx}] [Ground truth]\n{item.expected_text}")
             wer, cer, word_errors, char_errors = _compute_metrics(item.expected_text, ocr.full_text)
+            wer_str = f"{wer*100:.2f}%" if wer is not None else "n/a"
+            cer_str = f"{cer*100:.2f}%" if cer is not None else "n/a"
+            log.info(f"[item {idx}] status={ocr.status}  WER={wer_str}  CER={cer_str}")
             results.append(EvaluateResponse(
                 status=ocr.status,
                 engine=ocr.engine,
@@ -168,6 +206,12 @@ def evaluate_batch(request: BatchEvaluateRequest):
     aggregate = AggregateMetrics(
         mean_wer=round(sum(r.wer for r in valid) / len(valid), 4) if valid else 0.0,
         mean_cer=round(sum(r.cer for r in valid) / len(valid), 4) if valid else 0.0,
+    )
+    log.info(
+        f"batch done | evaluated={len(valid)}/{len(results)}"
+        f"  mean_WER={aggregate.mean_wer*100:.2f}%"
+        f"  mean_CER={aggregate.mean_cer*100:.2f}%"
+        f"  elapsed={time.perf_counter()-t0:.3f}s"
     )
     return BatchEvaluateResponse(results=results, aggregate=aggregate)
 
@@ -239,6 +283,8 @@ def _process_image(image_bytes: bytes, engine: str, lang: str = "auto", fuzzy: b
             for b in blocks
         ]
         full_text = "\n".join(b.text for b in blocks)
+
+    log.info(f"[OCR full text]\n{full_text}")
 
     return OCRResponse(
         status="ok",

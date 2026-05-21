@@ -73,7 +73,7 @@ def preprocess_image(
     nparr = np.frombuffer(image_bytes, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
 
-    img, upscale_factor = _upscale_if_small(img)
+    img, upscale_factor = _normalize_scale(img)
     img, deskew_angle, deskew_center = _deskew(img)
     _dbg(img, "deskewed")
 
@@ -139,21 +139,33 @@ def _estimate_char_height(img: np.ndarray) -> Optional[float]:
     return float(np.median(heights))
 
 
-def _upscale_if_small(
-    img: np.ndarray, target_char_height: int = 32
+def _normalize_scale(
+    img: np.ndarray,
+    target_char_height: int = 32,
+    max_dimension: int = 3000,
 ) -> Tuple[np.ndarray, float]:
+    h, w = img.shape[:2]
+
+    # Drive scale from estimated character height
+    factor = 1.0
     median_h = _estimate_char_height(img)
-    if median_h is None or median_h >= target_char_height:
+    if median_h is not None and median_h > 0:
+        factor = target_char_height / median_h
+        factor = min(factor, 6.0)   # never enlarge more than 6×
+        factor = max(factor, 1 / 6) # never shrink more than 6×
+
+    # Clamp so the longest side never exceeds max_dimension
+    longest = max(h, w) * factor
+    if longest > max_dimension:
+        factor *= max_dimension / longest
+
+    if abs(factor - 1.0) < 0.05:
         return img, 1.0
 
-    factor = min(target_char_height / median_h, 6.0)  # cap at 6× to avoid runaway memory
-    h, w = img.shape[:2]
-    img = cv2.resize(
-        img,
-        (int(w * factor), int(h * factor)),
-        interpolation=cv2.INTER_LANCZOS4,
-    )
-    return img, factor
+    interp = cv2.INTER_LANCZOS4 if factor >= 1.0 else cv2.INTER_AREA
+    new_w = max(1, int(round(w * factor)))
+    new_h = max(1, int(round(h * factor)))
+    return cv2.resize(img, (new_w, new_h), interpolation=interp), factor
 
 
 def _deskew(

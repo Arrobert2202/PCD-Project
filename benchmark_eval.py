@@ -5,6 +5,7 @@ Usage: python benchmark_eval.py [--photos test_photos] [--gt test_photos/ground_
 """
 
 import argparse
+import ast
 import base64
 import csv
 import json
@@ -27,9 +28,89 @@ REQUEST_TIMEOUT = 120
 SCENARIOS = [
     {"name": "Baseline",  "engine": "tesseract", "fuzzy": False, "lang": "en"},
     {"name": "Optimized", "engine": "easyocr",   "fuzzy": True,  "lang": "en"},
+    {"name": "Optimized", "engine": "paddleocr",   "fuzzy": False,  "lang": "auto"},
+
 ]
 
 CSV_COLUMNS = ["image", "scenario", "engine", "fuzzy", "wer", "cer", "latency_s", "status", "detected_language"]
+
+
+def _iter_top_level_literals(s):
+    """Yield substrings of s corresponding to top-level Python literals ({ } or [ ])."""
+    openers = {'{': '}', '[': ']', '(': ')'}
+    closers = set(openers.values())
+    i, n = 0, len(s)
+    while i < n:
+        while i < n and s[i].isspace():
+            i += 1
+        if i >= n:
+            break
+        if s[i] not in openers:
+            i += 1
+            continue
+        depth, in_str, str_char, j = 0, False, None, i
+        while j < n:
+            ch = s[j]
+            if in_str:
+                if ch == '\\':
+                    j += 2
+                    continue
+                if ch == str_char:
+                    in_str = False
+            elif ch in ('"', "'"):
+                in_str, str_char = True, ch
+            elif ch in openers:
+                depth += 1
+            elif ch in closers:
+                depth -= 1
+                if depth == 0:
+                    j += 1
+                    break
+            j += 1
+        yield s[i:j]
+        i = j
+
+
+def _build_text_from_sroie_annotations(annotation_list):
+    """Reconstruct reading-order text from a SROIE word-annotation list."""
+    rows = {}
+    for entry in annotation_list:
+        for word in entry.get('words', []):
+            text = word.get('text', '').strip()
+            if not text:
+                continue
+            row_id = word.get('row_id', 0)
+            quad = word.get('quad', {})
+            x1 = quad.get('x1', 0)
+            y1 = quad.get('y1', 0)
+            if row_id not in rows:
+                rows[row_id] = {'y1': y1, 'words': []}
+            rows[row_id]['words'].append((x1, text))
+
+    lines = []
+    for row in sorted(rows.values(), key=lambda r: r['y1']):
+        line_words = sorted(row['words'], key=lambda w: w[0])
+        lines.append(' '.join(w[1] for w in line_words))
+    return '\n'.join(lines)
+
+
+def parse_sroie_value(raw_value):
+    """
+    Each ground_truth.json value is a concatenation of Python literals.
+    The one that is a list of dicts with 'words'/'category' keys holds the
+    word-level annotations. Extract and reconstruct the receipt text from it.
+    Returns the raw string unchanged if no annotation list is found.
+    """
+    for obj_str in _iter_top_level_literals(raw_value):
+        if not obj_str.startswith('['):
+            continue
+        try:
+            obj = ast.literal_eval(obj_str)
+        except Exception:
+            continue
+        if isinstance(obj, list) and obj and isinstance(obj[0], dict) and 'words' in obj[0]:
+            return _build_text_from_sroie_annotations(obj)
+    return raw_value
 
 
 def encode(path):
@@ -103,7 +184,8 @@ def run(photos_dir, gt_path, url, output):
         print("Run prepare_dataset.py first.")
         sys.exit(1)
 
-    ground_truth = json.loads(gt_path.read_text(encoding="utf-8"))
+    raw_gt = json.loads(gt_path.read_text(encoding="utf-8"))
+    ground_truth = {name: parse_sroie_value(val) for name, val in raw_gt.items()}
     images = sorted(p for p in photos_dir.iterdir() if p.suffix.lower() in IMAGE_EXTS and p.name in ground_truth)
 
     if not images:
