@@ -1,9 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(python -c \"import torch; print\\(torch.__version__\\)\")",
-      "Skill(update-config)",
-      "Bash(uvicorn main:app --reload)"
-    ]
-  }
-}
